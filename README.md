@@ -43,9 +43,24 @@ For a detailed and applied understanding of meshes as Manifolds and triangulatio
 <summary><strong><span style="font-size:25px;">Functional Map</span></strong></summary>
 
 <details>
-<summary><span style="font-size:23px;">Understanding Functional Map Construction</span></summary>
+<summary><span style="font-size:23px;">General Overview</strong></summary>
 
-The functional map $(\mathscr{FM})$ allows computing a matrix representation of an unknown transformation function between meshes $\mathscr{FM}: \mathcal{F}(M_1,M_2) \to \mathbb{M}_{k \times k}(\mathbb{R})$.
+The functional map $(\mathscr{FM})$ allows us to compute a matrix representation $C$ of an unknown transformation function between meshes with whatever amount of vertices and a vector $v$ thar represent the vertex to vertex or the region to region transformation over the mesh.
+
+<div style="display: flex; gap: 10px; flex-wrap: wrap;">
+  <img src="./assets/FM_mat.PNG" style="max-width: 100%; height: auto; display: block; margin: 10px auto;"/>
+  <img src="./assets/FM_vec.PNG" style="max-width: 100%; height: auto; display: block; margin: 10px auto;"/>
+</div>
+
+In order to understand the dynamics of the deformation we can compute this matrix and vector in every time step $t_i$
+
+<img src="./assets/FMComp.gif" style="max-width: 100%; height: auto; display: block; margin: 10px auto;"/>
+
+At the end we can use this representations to have a lot of features, those are defined and explained on the correspondig <b>Functional Map Implementation Usage and Analysis</b> section.
+</details>
+
+<details>
+<summary><span style="font-size:23px;">Mathematical Construction Details</span></summary>
 
 Given two consecutive time step meshes $M_{t_{i-1}}$ and $M_{t_{i}}$, we can think about them in terms of their respective vertices (points) and faces (triangles): $\{\mathcal{V},\mathcal{F}\}_{t_{i-1}}$ and $\{\mathcal{V},\mathcal{F}\}_{t_{i}}$.
 
@@ -157,15 +172,9 @@ We need to take the basis representation of a point $x_j\in M_{t_{i-1}}$​, whi
 And then transform it to the spectral domain of $M_{t_{i}}$: 
 $$b_{x_j}=C\Phi_1(j, :)^\top$$
 
-Take the vertex $k$ in $M_{t_{i}}$ that is closest to this transformed representation:
+Take the vertex $k$ in $M_{t_{i}}$ that is closest to this transformed representation that is, we perfrom a Nearest Neighbor Search ( For every vertex on the source mesh, you look for the vertex on the target mesh that is "closest" in this spectral embedding space)
 
 $$v_j = \arg \min_{k \in \text{Vertices}(M_{t_{i}})} \| \Phi_2(k, :)^\top - C \Phi_1(j, :)^\top \|^2$$
-
-Having this matrix representation, we can compute a large variety of descriptors to characterize the dynamics.
-
-The full pipeline can be summarized through the following scheme:
-
-<img src="./assets/FMComp.gif" style="max-width: 100%; height: auto; display: block; margin: 10px auto;"/>
 
 </details>
 
@@ -474,9 +483,25 @@ This acts as a measure of acceleration or intensity change. If the deformation i
 <summary><strong><span style="font-size:25px;">Reeb Graph</span></strong></summary>
 
 <details>
-<summary><span style="font-size:23px;"> Understanding Reeb Graph Construction</span></summary>
+<summary><span style="font-size:23px;">General Overview</span></summary>
 
-The Reeb Graph ($\mathscr{RG}$) is a powerful tool that allows computing a graph representation of a mesh (topology skeleton) using Morse theory (level curves or contour lines of the mesh) $\mathscr{RG}:\mathcal{M} \to \{(V,E),\tau\}$.
+The Reeb Graph ($\mathscr{RG}$) is a powerful tool that allows computing a graph representation of a mesh (topology skeleton) using Morse theory (level curves or contour lines of the mesh).
+
+This is possible by assigning a vertex in the graph to each level curve, which generates a graph based on the local geometric structures.
+
+<img src="./assets/reeb_T.png" style="max-width: 100%; height: auto; display: block; margin: 10px auto;"/>
+
+In order to understand the dynamics of the deformation we can compute this graophs in every time step $t_i$
+
+<img src="./assets/RGComp.gif" style="max-width: 100%; height: auto; display: block; margin: 10px auto;"/>
+
+At the end we can use this representations to have a lot of features, those are defined and explained on the correspondig <b>Reeb Graph Usage and Analysis</b> section
+
+
+</details>
+
+<details>
+<summary><span style="font-size:23px;">Mathematical Construction Details</span></summary>
 
 Given a real scalar field over the mesh $f:M_{t_{i}} \to \mathbb{R}$ and the following equivalence relation: $x_1,x_2 \in M_{t_{i}}$ are related $x_1 \sim x_2$ if and only if they belong to the same level set: $x_1,x_2 \in f^{-1}(c)$.
 
@@ -491,15 +516,8 @@ Defining the equivalence relation means that we need to look at how many points 
 Saying that the graph has the quotient topology means that the graph captures the topology relationships of the mesh.
 
 The idea is easy to follow graphically: 
-<div style="display: flex; gap: 10px; flex-wrap: wrap;">
-<img src="./assets/reeb_T.png" style="max-width: 100%; height: auto; display: block; margin: 10px auto;"/>
+
 <img src="./assets/rg.gif" style="max-width: 100%; height: auto; display: block; margin: 10px auto;"/>
-</div>
-
-
-The full dynamical analysis pipeline can be summarized through the following scheme:
-
-<img src="./assets/RGComp.gif" style="max-width: 100%; height: auto; display: block; margin: 10px auto;"/>
 
 </details>
 
