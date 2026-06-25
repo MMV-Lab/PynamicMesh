@@ -9,6 +9,7 @@ from pyFM.mesh import TriMesh
 from PIL import Image
 import pickle
 from PynamicMesh.core.basicGeometry import compute_mesh_geometry, generate_plots_from_csv
+from PynamicMesh.core.graph_sim import graph_similarity, plot_graph_similarity
 from PynamicMesh.core.physic_model import (
     plot_diagonal, 
     generate_tranformation_heatmap, 
@@ -240,7 +241,9 @@ def run_pipeline(path_str, is_batch=False, batch_kwargs=None, **kwargs):
         compute_basicGeo = current_params.get("compute_basicGeo", True)
         plot_basicGeo = current_params.get("plot_basicGeo", True)
         metrics = current_params.get("metrics",'all')
-
+        
+        graph_sim = current_params.get("graph_sim", True)
+        graph_metrics = current_params.get("graph_metrics", 'all')
 
         process_seq_keys = [
             'plot_basicGeo','compute_basicGeo','metrics','matrix_tranformation', 'diagonal_analysis', 'isometric_analysis',
@@ -268,3 +271,7 @@ def run_pipeline(path_str, is_batch=False, batch_kwargs=None, **kwargs):
         if time_graph_analysis and RG_out_path and RG_out_path.strip():
             csv_path = graph_time_analysis(RG_out_path,single_file=False)
             plot_dynamic_graph_analysis(csv_path,single_file=False)
+
+        if graph_sim:
+            csv_sim_path = graph_similarity(reeb_folder_path=RG_out_path,metrics_list=graph_metrics,single_file=False)
+            plot_graph_similarity(csv_sim_path,single_file=False)

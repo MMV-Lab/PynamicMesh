@@ -61,7 +61,7 @@ In order to track the Global Geometry, run:
 ```python
 from PynamicMesh.core.pipelines import run_pipeline
 run_pipeline(
-    path_str='base/path'
+    path_str='base/path',
     compute_basicGeo = True,
     metrics = 'all',
     plot_basicGeo = True
@@ -113,22 +113,36 @@ metrics (list) : ['metric_1',...,'metric_n']
 ```
 
 
-Mesh Detail : ```n_vertices``` and  ```n_faces```  captures the structural resolution of the mesh (the total number of points and connecting triangles), constant values mean the object is changing shape or moving without altering its basic blueprint. 
+<b>Mesh Detail:</b>
+
+```n_vertices``` and  ```n_faces```  captures the structural resolution of the mesh (the total number of points and connecting triangles), constant values mean the object is changing shape or moving without altering its basic blueprint. 
 Changing values mean the model is actively gaining or losing detail (e.g., tearing, merging, or adaptive rewriting).
 
-Surface Area ```area``` captures the total amount of  outside covering for the mesh, tracks stretching and compression. If the surface area spikes while the overall size remains constant, it indicates that the object is wrinkling, crumpling, or becoming highly textured.
+<b>Surface Area:</b> 
 
-Volume ```volume```  captures the total relative amount of physical space enclosed inside the object, tracks inflation and deflation. A steady volume means the object is maintaining its physical mass/size while it moves or bends.
+```area``` captures the total amount of  outside covering for the mesh, tracks stretching and compression. If the surface area spikes while the overall size remains constant, it indicates that the object is wrinkling, crumpling, or becoming highly textured.
 
-Sphericity ```phericity``` captures the roundness score from 0 to 1, evaluating how closely the object resembles a perfect ball (1 being a perfect sphere).  A rising score means the object is compacting or pulling itself together into a ball shape. 
+<b>Volume:</b> 
+
+```volume```  captures the total relative amount of physical space enclosed inside the object, tracks inflation and deflation. A steady volume means the object is maintaining its physical mass/size while it moves or bends.
+
+<b>Sphericity:</b>
+
+```sphericity``` captures the roundness score from 0 to 1, evaluating how closely the object resembles a perfect ball (1 being a perfect sphere).  A rising score means the object is compacting or pulling itself together into a ball shape. 
 A falling score means it is stretching out, flattening, or growing irregular limbs.
 
-Convexity ```convexity```  captures a "bulginess" score measuring how many hollows, indents, or valleys the object has.  A high score indicates a smooth, rounded object. A decreasing score means the object is actively folding in on itself, developing deep cavities, or sprouting appendages.
+<b>Convexity:</b> 
 
-Surface Curvature ```mean_gaussian_curvature```  captures the average texture profile of the surface, distinguishing between dome-like features and saddle-like curves.
+```convexity```  captures a "bulginess" score measuring how many hollows, indents, or valleys the object has.  A high score indicates a smooth, rounded object. A decreasing score means the object is actively folding in on itself, developing deep cavities, or sprouting appendages.
+
+<b>Surface Curvature:</b> 
+
+```mean_gaussian_curvature```  captures the average texture profile of the surface, distinguishing between dome-like features and saddle-like curves.
 Serves as a global bumpiness tracker. Rapid fluctuations indicate that the smooth skin of the object is rapidly turning wavy, creased, or jagged.
 
-Relative Movement Speed ```center_mass``` captures the straight-line distance traveled by the object's center of gravity from one time frame to the next. Tracks overall speed. A flat line near zero means the object is stationary (even if it is spinning or shaking in place).
+<b>Relative Movement Speed:</b>
+
+```center_mass``` captures the straight-line distance traveled by the object's center of gravity from one time frame to the next. Tracks overall speed. A flat line near zero means the object is stationary (even if it is spinning or shaking in place).
 Sudden spikes indicate a sudden leap or fast global movement across space.
 
 </details>
@@ -965,7 +979,7 @@ The original computed graphs are not overridden. The modified graphs will be sto
 </details>
 
 <details>
-<summary><span style="font-size:21px;">Time Graph analysis and plotting</span></summary>
+<summary><span style="font-size:21px;">Time Graph Analysis</span></summary>
 
 When the desired graphs are ready and saved, we can run a temporal analysis and generate the plot of the results and the CSV with the data:
 
@@ -1017,6 +1031,93 @@ This analysis allows us to automatically pinpoint exactly when and how your 3D m
   <img src="./assets/2_Graph_Distances.png" style="max-width: 100%; height: auto;"/>
   <img src="./assets/3_Internal_Topology.png" style="max-width: 100%; height: auto;"/>
 </div>
+
+</details>
+</details>
+</details>
+
+<details>
+<summary><strong><span style="font-size:25px;">Graph Similarity Metrics</span></strong></summary>
+
+Having the graphs that enode the geometry of the transformation on the time step $t_i$ we can compute pairwise similarity metrics with the following code this will generate a csv with the resuslts and the corresponding plot within the path /PynamicMes/Results/scene1/Graph_analysis.
+
+
+```python
+from PynamicMesh.core.pipelines import run_pipeline
+run_pipeline(**args)
+```
+
+In order to track the Graph Similarity, run:
+
+```python
+from PynamicMesh.core.pipelines import run_pipeline
+run_pipeline(
+    path_str='base/path',
+    graph_sim = True, 
+    graph_metrics = 'all'
+    )
+```
+
+Or you can set your parameters on the [yaml](./examples/config.yaml) file, and within the PynamicMesh enviroment run on the comand line:
+
+```python
+run_pynamic --config /path/to/the/config.yaml
+```
+<img src="./assets/graph_sim.png" style="max-width: 50%; height: auto; display: block; margin: 0 auto;"/>
+
+<details>
+<summary><span style="font-size:23px;">Graph Similarity Parameters</span></summary>
+
+Path to the root folder that contains the scenes:
+```python 
+path_str (str) 
+```   
+
+Flag to indicate the execution:
+```python 
+graph_sim (bool)
+```  
+
+Desired metrics to track:
+
+```python 
+graph_metrics (str) | (list)
+```
+<details>
+<summary><span style="font-size:21px;">Available metrics</span></summary>
+
+Compute and report all the available metrics :
+
+```python 
+graph_metrics (str) : 'all'
+```
+
+Compute just the selected set of metrics :
+
+```python 
+graph_metrics (list) : ['metric_1',...,'metric_n']
+```
+
+
+<b>Degree Wasserstein Distance:</b>
+
+```degree_wasserstein``` measures the difference in how "busy" or interconnected the junctions (nodes) are in the graph. This tracks local branching changes. If the mesh splits or merges, the junctions on the skeleton get more or fewer connections. A high value means the complexity of the intersections has shifted dramatically.
+
+<b>Spectral Laplacian Distance:</b>
+
+```spectral_laplacian``` measures the global "fingerprint" or structural vibe of the graph based on its overall matrix structure. This tracks major global shape deformations. We can think of it as looking at the big picture. If the mesh undergoes a massive twist, a huge stretch, or collapses entirely, this metric will spike. It is excellent for catching massive, macro-level structural changes rather than tiny details.
+
+<b>Interleaving Distance & Labeled Interleaving Distance:</b>
+
+```interleaving_distance``` , ```labeled_interleaving_distance```  measures the difference in the height or position (the scalar values) of the graph's features.  This tracks spatial stretching or shifting along an axis. Because it looks at the positions (pos or bin) of the nodes, it tell us if the mesh is being pulled upward, compressed downward, or if features are migrating along the direction of your measurement function.
+
+<b>Function Distortion Distance:</b>
+
+```function_distortion_distance``` measures the difference in the "shortest travel distance" between all points on the graph. This tracks elongation and structural shortening. This metric catches how much the "internal travel distance" across the mesh's skeleton is warping.
+
+<b>Branch Decomposition Distance:</b>
+
+```branch_decomposition_distance``` measures the literal count of loops/holes (Betti numbers) and major branching points in the graph. This tracks pure topological tearing or gluing. It completely ignores how long or tall the shape is and focuses strictly on structure. If your deforming mesh rips open a new hole (like dough pulling apart) or sprouts a brand new limb, this metric registers that discrete structural change.
 
 </details>
 </details>

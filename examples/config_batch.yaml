@@ -28,6 +28,10 @@ scene1:
     scalar_args: 
       vertex_ref_index: [4896]
 
+  Graph_similarity:
+      graph_sim: True
+      graph_metrics: all
+
 scene2:
   Basic_Geometry:
     compute_basicGeo: True
@@ -48,3 +52,7 @@ scene2:
     time_graph_analysis: True
     reeb_scalar: 'x'
     bins: 5
+
+  Graph_similarity:
+      graph_sim: True
+      graph_metrics: all

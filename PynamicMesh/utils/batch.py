@@ -11,7 +11,8 @@ def run_batch(config,path_str):
         fm_cfg = value.get("Functional_Map", {})
         rg_cfg = value.get("Reeb_Graph", {})
         bg_cfg = value.get("Basic_Geometry", {})
-        batch_kwargs[key] = extract_kwargs(fm_cfg, rg_cfg, bg_cfg)
+        gs_cfg = value.get("Graph_similarity", {})
+        batch_kwargs[key] = extract_kwargs(fm_cfg, rg_cfg, bg_cfg, gs_cfg)
             
     if not batch_kwargs:
         print("Error: Batch mode enabled, but no scene configurations found in YAML.", file=sys.stderr)
