@@ -56,32 +56,32 @@ precompute_landmarks(base_mesh_path,'harmonic')
 
 ####################################################################################################### Runing Full pipeline over folder system ##########################################################################################################################
 
-####################################################################################################### Basic Geometry ###############################################################################################################################################
-compute_basicGeo = True
-plot_basicGeo = True
-
 ####################################################################################################### Functional Map Settings ##########################################################################################################################################
-compute_FM = True
+compute_FM = False
 compute_FMdiagonal_analysis = True
 compute_isometric_analysis = True
 FM_k_eigenfunctions = (10,10)
 FM_k_eigenvalues = 100
 FM_descriptors = 'WKS+HKS'
-FM_landmarks = 'Precomputed'
+FM_landmarks = 'precomputed'
 compute_physic_fields = True
 
 ####################################################################################################### Reeb Graph Settings ###############################################################################################################################################
-compute_RG = True
+compute_RG = False
 compute_graph_time_analysis = True
-reeb_scalar_field = 'geodesic'
+reeb_scalar_field = 'geodesic' #'mass_center_geodesic' 
 bins = 30
 vertex_ref_index = [4896]
 
 ####################################################################################################### Basic Geometry Settings ############################################################################################################################################
-
 compute_BasicGeo = True
 plot_basicGeo = True
-metrics = 'all'
+metrics = 'all' # ['n_vertices', 'n_faces', 'area', 'volume', 'sphericity', 'gaussian_curvature', 'convexity', 'center_mass']
+
+####################################################################################################### Graph Similairty Meetrics ##########################################################################################################################################
+compute_Graphsimilarity = True
+graph_metrics = 'all' # ['degree_wasserstein','spectral_laplacian','interleaving_distance','labeled_interleaving_distance','function_distortion_distance','branch_decomposition_distance']
+
 
 ####################################################################################################### Pipeline Runing ###################################################################################################################################################
 print('Executing pipeline ...')
@@ -102,7 +102,9 @@ run_pipeline(
     time_graph_analysis=compute_graph_time_analysis,
     reeb_scalar=reeb_scalar_field,
     bins=bins,
-    vertex_ref_index=vertex_ref_index
+    vertex_ref_index=vertex_ref_index,
+    graph_sim = compute_Graphsimilarity,
+    graph_metrics = graph_metrics
     )
 
 ###########################################################################################################################################################################################################################################################################
@@ -130,6 +132,10 @@ visualize_reeb_graphs(mesh_path, reeb_path)
 ####################################################################################################### Functional Map Visualizer Launcher  #################################################################################################################################
 print('Multi-Physics Mapping visualizations...') 
 visualize_physics(mesh_path, matrix_path, on_time=False)
+
+###################################################################################################### Similarity Metrics Among Graphs and ploting  ##################################################################################################################################
+csv_sim_path = graph_similarity(reeb_folder_path=reeb_path,metrics_list=graph_metrics)
+plot_graph_similarity(csv_sim_path)
 
 ###########################################################################################################################################################################################################################################################################
 

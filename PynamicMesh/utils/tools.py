@@ -57,7 +57,7 @@ def extract_yaml(config_path):
     return config
 
 
-def extract_kwargs(fm_cfg, rg_cfg, bg_cfg):
+def extract_kwargs(fm_cfg, rg_cfg, bg_cfg, gs_cfg):
     """Helper function to extract arguments from the config dictionaries."""
     
     k_eigen = fm_cfg.get("k_eigenfunctions", (10, 10))
@@ -97,7 +97,11 @@ def extract_kwargs(fm_cfg, rg_cfg, bg_cfg):
         # Simple Geometry Settings
         "compute_basicGeo": bg_cfg.get("compute_basicGeo", True),
         "plot_basicGeo": bg_cfg.get("plot_basicGeo", True),
-        "metrics": bg_cfg.get("metrics", 'all') 
+        "metrics": bg_cfg.get("metrics", 'all'),
+
+        # Graph Similarity Settings
+        "graph_sim": gs_cfg.get("graph_sim", True),
+        "graph_metrics": gs_cfg.get("graph_metrics",'all')
     }
 
     scalar_args = rg_cfg.get("scalar_args", {})

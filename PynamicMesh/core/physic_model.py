@@ -11,7 +11,7 @@ try:
     import cupy as xp
     import cupyx as xxp 
     GPU_AVAILABLE = True
-    print("[INFO] CuPy detected. Utilizing GPU for physics and metric computations.")
+    print("[INFO] CuPy detected. Utilizing GPU for Physics and metric computations.")
 except ImportError:
     xp = np
     GPU_AVAILABLE = False

@@ -23,4 +23,8 @@ Reeb_Graph:
   reeb_scalar: 'geodesic'
   bins: 30
   scalar_args: 
-    vertex_ref_index: [4896] 
+    vertex_ref_index: [4896]
+
+Graph_similarity:
+    graph_sim: True
+    graph_metrics: all
