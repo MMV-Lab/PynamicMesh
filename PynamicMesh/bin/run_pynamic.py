@@ -6,12 +6,8 @@ import sys
 from pathlib import Path
 import yaml
 from PynamicMesh.core.pipelines import run_pipeline
-from PynamicMesh.utils.batch import run_batch
-from PynamicMesh.utils.tools import (
-    extract_kwargs,
-    extract_yaml
-)
-
+from PynamicMesh.utils.batch import run_batch, scene_kwargs
+from PynamicMesh.utils.tools import extract_yaml
 
 
 def main():
@@ -32,7 +28,7 @@ def main():
         default=False,
         help="Indicate if a batch analysis is performed (separate configs per scene folder)"
     )
-    
+
     args = parser.parse_args()
     config_path = args.config
 
@@ -46,21 +42,19 @@ def main():
         sys.exit(1)
 
     print(f"Executing pipeline with configuration from: {config_path}")
-    
+
     try:
         if args.batch:
-            run_batch(config,path_str)
+            run_batch(config, path_str)
         else:
-            
-            fm_cfg = config.get("Functional_Map", {})
-            rg_cfg = config.get("Reeb_Graph", {})
-            bg_cfg = config.get("Basic_Geometry", {})
-            global_kwargs = extract_kwargs(fm_cfg, rg_cfg,bg_cfg)
+            # Same flattening as the batch mode (includes the Graph_similarity section and fm_params).
+            global_kwargs = scene_kwargs(config)
             run_pipeline(path_str=path_str, is_batch=False, **global_kwargs)
         print("Pipeline execution completed successfully.")
     except Exception as e:
         print(f"An error occurred during pipeline execution: {e}", file=sys.stderr)
         sys.exit(1)
+
 
 if __name__ == "__main__":
     main()

@@ -8,6 +8,12 @@ from pathlib import Path
 import numpy as np
 import pyvista as pv
 from pyFM.mesh import TriMesh
+import re
+
+def natural_sort_key(path_obj):
+    """Moved outside the class to allow shared access for batch processing."""
+    return [int(text) if text.isdigit() else text.lower() 
+            for text in re.split(r'(\d+)', path_obj.name)]
 
 def mesh_mat2object(filepath):
 
@@ -57,23 +63,35 @@ def extract_yaml(config_path):
     return config
 
 
-def extract_kwargs(fm_cfg, rg_cfg, bg_cfg, gs_cfg):
-    """Helper function to extract arguments from the config dictionaries."""
-    
+def extract_kwargs(fm_cfg, rg_cfg, bg_cfg, gs_cfg=None):
+    """
+    Helper function to extract arguments from the config dictionaries.
+
+    Known keys receive defaults; every other key of the sections is forwarded unchanged, so the
+    advanced functional-map options (nested `fm_params` or flat `symmetry_mode`, `landmark_params`,
+    `descr_params`, `fit_params`, `n_descr`, `subsample_step`, `refine`, `dt`, `verbose`) and the
+    scalar-field options of the Reeb graph reach run_pipeline (which normalizes them).
+    """
+    fm_cfg, rg_cfg, bg_cfg, gs_cfg = (dict(c or {}) for c in (fm_cfg, rg_cfg, bg_cfg, gs_cfg))
+
     k_eigen = fm_cfg.get("k_eigenfunctions", (10, 10))
     
     if isinstance(k_eigen, str):
         try:
             parsed = ast.literal_eval(k_eigen.strip())
             if isinstance(parsed, (tuple, list)):
-                k_eigen = tuple(parsed)
+                k_eigen = tuple(int(v) for v in parsed)
+            elif isinstance(parsed, int):
+                k_eigen = (parsed, parsed)
             else:
                 k_eigen = (10, 10)
         except (ValueError, SyntaxError):
             print(f"Warning: Could not parse k_eigenfunctions '{k_eigen}'. Falling back to default (10, 10).", file=sys.stderr)
             k_eigen = (10, 10)
     elif isinstance(k_eigen, list):
-        k_eigen = tuple(k_eigen)
+        k_eigen = tuple(int(v) for v in k_eigen)
+    elif isinstance(k_eigen, int):
+        k_eigen = (k_eigen, k_eigen)
 
     
 
@@ -107,28 +125,47 @@ def extract_kwargs(fm_cfg, rg_cfg, bg_cfg, gs_cfg):
     scalar_args = rg_cfg.get("scalar_args", {})
     if isinstance(scalar_args, dict):
         kwargs.update(scalar_args)
-        
+
+    # Pass-through of every other key (fm_params, flat FM options, extra scalar-field options, ...).
+    for cfg in (fm_cfg, rg_cfg, bg_cfg, gs_cfg):
+        for key, value in cfg.items():
+            if key == "scalar_args" or key in kwargs:
+                continue
+            kwargs[key] = value
+
     return kwargs
 
+LANDMARK_FILES = {
+    'FM': 'landmarks.npy',
+    'geodesic': 'vert_ref_geo.npy',
+    'mass_center_geodesic': 'vert_ref_geo.npy',
+    'heat_diffusion': 'sources.npy',
+    'matern_kernel': 'sources.npy',
+    'harmonic': 'source_sink.npy',
+}
+
+
 def landmark_load(landmarks, target_folder, mood):
-    if mood == 'FM':
-        file = 'landmarks.npy'
-    if mood == 'geodesic':
-        file = 'vert_ref_geo.npy'
-    if mood == 'heat_diffusion':
-        file = 'sources.npy'
-    if mood == 'harmonic':
-        file = 'source_sink.npy'
-    
+    file = LANDMARK_FILES.get(mood)
+    if file is None:
+        raise ValueError(f"No precomputed selection file is defined for '{mood}'. Options: {list(LANDMARK_FILES)}")
+    if mood == 'matern_kernel':
+        mood = 'heat_diffusion'
+    if mood == 'mass_center_geodesic':
+        mood = 'geodesic'
+
     loaded_landmarks = None
     if isinstance(landmarks, str) and landmarks.lower() == 'precomputed':
         temp = []
-        landmarks_file = target_folder / file
+        landmarks_file = Path(target_folder) / file
         if landmarks_file.exists():
             try:
                 loaded_landmarks = np.load(landmarks_file, allow_pickle=True)
                 if mood == 'FM':
-                    loaded_landmarks = np.array([x for x in loaded_landmarks], dtype=int)
+                    # One (n, 2) pair array per transition, or None for transitions without selection.
+                    # Kept as a list: transitions may have different numbers of pairs.
+                    loaded_landmarks = [None if x is None or len(x) == 0 else np.asarray(x, dtype=int)
+                                        for x in loaded_landmarks]
                 if mood == 'geodesic' or mood == 'heat_diffusion':
                     for element in loaded_landmarks:
                         if isinstance(element, list):
@@ -136,12 +173,16 @@ def landmark_load(landmarks, target_folder, mood):
                         else:
                             temp.append([0])
                     loaded_landmarks = temp
-            except:
+            except Exception as exc:
                 if mood != 'FM':
-                    raise ValueError(f'file not found: {landmarks_file}')
+                    raise ValueError(f'Could not read precomputed selection {landmarks_file}: {exc}')
+                print(f"[Warning] Could not read precomputed landmarks {landmarks_file} ({exc}); running without landmarks.",
+                      file=sys.stderr)
                 loaded_landmarks = None
         else:
-            loaded_landmarks = None 
+            print(f"[Warning] Precomputed selection requested but {landmarks_file} does not exist; using defaults.",
+                  file=sys.stderr)
+            loaded_landmarks = None
     return loaded_landmarks
 
 
@@ -150,7 +191,10 @@ def landmark_parser(landmarks, loaded_landmarks, i, mood=None):
     if isinstance(landmarks, str):
         if landmarks.lower() == 'precomputed' and loaded_landmarks is not None:
             if mood == 'FM':
-                current_landmarks = loaded_landmarks[i-1].astype(int)
+                sel = loaded_landmarks[i-1] if 0 <= i-1 < len(loaded_landmarks) else None
+                current_landmarks = None if sel is None else np.asarray(sel, dtype=int)
+            if mood == 'matern_kernel':
+                mood = 'heat_diffusion'
             if mood == 'geodesic':
                 current_landmarks = loaded_landmarks[i]
             if mood == 'heat_diffusion':
@@ -300,4 +344,4 @@ def optimize_param(meshn_1, meshn):
         step = 2
     else:
         return None 
-    return (nit, step)    
+    return (nit, step)

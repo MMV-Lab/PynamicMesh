@@ -1,9 +1,9 @@
-
 # Root of the scene folder container
 Data:
   path_str: './Mesh_models'
 
 ################################################################### Individual params for each scene on the folder ####################################################################################################
+# scene1: automatic landmarks + orientation term + extrinsic descriptors (recommended for shapes with bilateral symmetry)
 scene1:
   Basic_Geometry:
     compute_basicGeo: True
@@ -14,24 +14,37 @@ scene1:
     matrix_tranformation: True
     diagonal_analysis: True
     isometric_analysis: True
-    k_eigenfunctions: (10,10)
+    k_eigenfunctions: [10, 10]
     k_eigenvalues: 100
-    descriptor: 'WKS+HKS'
-    landmarks: 'precomputed'
+    descriptor: '0.6*WKS + 0.4*MKS'
+    landmarks: 'auto'
     compute_physic_fields: True
+    fm_params:
+      symmetry_mode: 'landmarks+orientation+extrinsic'
+      subsample_step: 4
+      landmark_params:
+        n_landmarks: 12
+        match: 'hybrid'
+      descr_params:
+        nu: 1.5
+        xyz_weight: 0.25
+      fit_params:
+        w_orient: 1.0
 
   Reeb_Graph:
     compute_reeb: True
     time_graph_analysis: True
     reeb_scalar: 'geodesic'
     bins: 30
-    scalar_args: 
+    scalar_args:
       vertex_ref_index: [4896]
+      geodesic_solver: 'heat'
 
   Graph_similarity:
       graph_sim: True
       graph_metrics: all
 
+# scene2: precomputed (manually selected) landmarks only; FM options written flat (equivalent to nesting them in fm_params)
 scene2:
   Basic_Geometry:
     compute_basicGeo: True
@@ -42,10 +55,47 @@ scene2:
     matrix_tranformation: True
     diagonal_analysis: True
     isometric_analysis: True
-    k_eigenfunctions: (10,10)
+    k_eigenfunctions: [10, 10]
     k_eigenvalues: 100
-    descriptor: 'WKS+HKS'
+    descriptor: 'WKS+HKS+MKS'
+    landmarks: 'precomputed'
+    symmetry_mode: 'landmarks'
+    subsample_step: 4
     compute_physic_fields: True
+
+  Reeb_Graph:
+    compute_reeb: True
+    time_graph_analysis: True
+    reeb_scalar: 'heat_diffusion'
+    bins: 25
+    scalar_args:
+      source_idx: 'mass_center'
+      t: 'auto'
+
+  Graph_similarity:
+      graph_sim: True
+      graph_metrics: all
+
+# scene3: no landmarks, symmetry-aware descriptors only (XYZ requested explicitly in the descriptor string)
+scene3:
+  Basic_Geometry:
+    compute_basicGeo: True
+    plot_basicGeo: True
+    metrics: 'all'
+
+  Functional_Map:
+    matrix_tranformation: True
+    diagonal_analysis: True
+    isometric_analysis: True
+    k_eigenfunctions: 10
+    k_eigenvalues: 100
+    descriptor: '0.5*WKS + 0.3*MKS + 0.2*XYZ'
+    landmarks: null
+    compute_physic_fields: True
+    fm_params:
+      symmetry_mode: 'orientation'
+      fit_params:
+        w_orient: 1.0
 
   Reeb_Graph:
     compute_reeb: True
