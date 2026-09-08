@@ -28,7 +28,9 @@ dependencies = [
     "rtree",
     "geometric_kernels",
     "torch",
-    "gpytorch"
+    "gpytorch",
+    "tifffile",
+    "imageio"
 ]
 
 

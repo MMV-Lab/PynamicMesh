@@ -69,9 +69,10 @@ compute_FMdiagonal_analysis = True
 compute_isometric_analysis = True
 FM_k_eigenfunctions = (10,10)
 FM_k_eigenvalues = 100
-FM_descriptors = 'WKS+HKS'
+FM_descriptors = 'WKS+HKS+MKS'
 FM_landmarks = 'precomputed'
 compute_physic_fields = True
+FM_symmetri = {'symmetry_mode': 'landmarks+orientation+extrinsic'}
 
 ####################################################################################################### Reeb Graph Settings ###############################################################################################################################################
 compute_RG = False
@@ -104,6 +105,7 @@ run_pipeline(
     k_eigenvalues=FM_k_eigenvalues,
     descriptor=FM_descriptors,
     landmarks=FM_landmarks,
+    fm_params=FM_symmetri,
     compute_physic_fields=compute_physic_fields, 
     compute_reeb=compute_RG,
     time_graph_analysis=compute_graph_time_analysis,
@@ -140,13 +142,31 @@ visualize_reeb_graphs(mesh_path, reeb_path)
 print('Multi-Physics Mapping visualizations...') 
 visualize_physics(mesh_path, matrix_path, on_time=False)
 
-###################################################################################################### Similarity Metrics Among Graphs and ploting  ##################################################################################################################################
+###################################################################################################### Similarity Metrics Among Graphs and ploting  ##########################################################################################################################
 csv_sim_path = graph_similarity(reeb_folder_path=reeb_path,metrics_list=graph_metrics)
 plot_graph_similarity(csv_sim_path)
 
-###########################################################################################################################################################################################################################################################################
 
-####################################################################################################### Paths reference list ##########################################################################################################################################
+################################################################################################################################################################################################################################################################################
+
+####################################################################################################### .mat image/mesh visualizer #############################################################################################################################################
+from PynamicMesh.utils.mat_files import MatViewer 
+from pathlib import Path
+
+folder_path = Path(r'C:\Users\jair.sanchez\Downloads\Projects\PynamicMesh\Real_cell\Dendetric\Dendetric1\Img')
+viewer = MatViewer(folder_path)
+viewer.show()
+
+####################################################################################################### .mat image/mesh converter .obj/tiff #####################################################################################################################################
+from PynamicMesh.utils.mat_files import mat_file_converter 
+from pathlib import Path
+
+folder_path = Path(r'C:\Users\jair.sanchez\Downloads\Projects\PynamicMesh\Real_cell\Dendetric\Dendetric1\Img')
+mat_file_converter(folder_path)
+
+#################################################################################################################################################################################################################################################################################
+
+####################################################################################################### Paths reference list ####################################################################################################################################################
 
 from PynamicMesh.utils.batch import run_batch
 from PynamicMesh.utils.tools import extract_yaml
@@ -159,4 +179,90 @@ data_cfg = config.get("Data", {})
 path_str = data_cfg.get("path_str")
 run_batch(config,path_str)
 
-###########################################################################################################################################################################################################################################################################
+##################################################################################################################################################################################################################################################################################
+####################################################################################################### FM use of cases example ###################################################################################################################################################
+
+#   'a' : FM without landmarks, plain intrinsic descriptors            (baseline; symmetric flips possible)
+#   'b' : FM with precomputed (manually selected) landmarks only
+#   'c' : FM with automatic landmarks only
+#   'd' : FM with symmetry-aware descriptors only, no landmarks at all  (orientation term + extrinsic XYZ block)
+EXAMPLE = 'd'
+
+compute_FM = True
+compute_FMdiagonal_analysis = True
+compute_isometric_analysis = True
+FM_k_eigenfunctions = (10, 10)
+FM_k_eigenvalues = 100
+compute_physic_fields = True
+
+common_fm_params = {
+    'n_descr': 100,
+    'subsample_step': 4,
+    'descr_params': {'nu': 1.5, 'k_smooth': 30, 'xyz_weight': 0.25},
+    'fit_params': {'w_descr': 1e-1, 'w_lap': 1e-3, 'w_dcomm': 1.0},
+    'refine': 'auto',
+    'dt': 1.0,
+    'verbose': False,        # prints the descriptor plan and the landmarks kept for each pair
+}
+
+FM_EXAMPLES = {
+    # ---------------------------------------------------------------------------------------------------------------
+    # a) No landmarks. Only intrinsic point signatures: the map is determined up to the intrinsic symmetries
+    #    of the shape (left/right legs can be swapped between frames).
+    'a': dict(
+        descriptor='WKS+HKS+MKS',           # equal energy shares; or e.g. '0.5*WKS + 0.3*HKS + 0.2*MKS'
+        landmarks=None,
+        fm_params={**common_fm_params, 'symmetry_mode': 'none'},
+    ),
+    # ---------------------------------------------------------------------------------------------------------------
+    # b) Precomputed landmarks only. Uses the selections stored by precompute_landmarks() /
+    #    visual_selection_edition() (mood='FM'); landmark-localized WKS descriptors break the symmetry.
+    'b': dict(
+        descriptor='WKS+HKS+MKS',
+        landmarks='precomputed',
+        fm_params={**common_fm_params, 'symmetry_mode': 'landmarks',
+                   'landmark_params': {'weight': 1.0, 'descriptor': 'WKS'}},
+    ),
+    # ---------------------------------------------------------------------------------------------------------------
+    # c) Automatic landmarks only. Farthest-point samples on frame t (extremities first), matched on frame t+1
+    #    (descriptor match within a spatial radius), outliers rejected by displacement / duplicates / geodesic
+    #    consistency. Landmarks used are saved in Results\<scene>\Landmarks\.
+    'c': dict(
+        descriptor='WKS+HKS+MKS',
+        landmarks='auto',
+        fm_params={**common_fm_params, 'symmetry_mode': 'landmarks',
+                   'landmark_params': {'n_landmarks': 12, 'match': 'hybrid', 'max_rel_dist': 0.15,
+                                       'max_distortion': 0.25, 'min_landmarks': 4, 'search_rel_radius': 0.10,
+                                       'weight': 1.0}},
+    ),
+    # ---------------------------------------------------------------------------------------------------------------
+    # d) Symmetry-aware descriptors only, no landmarks. 'extrinsic' adds an aligned-coordinates (XYZ) descriptor
+    #    block (valid between aligned consecutive frames), 'orientation' adds the orientation-preserving operator
+    #    term (w_orient) that penalizes the mirrored map. The XYZ block can also be requested explicitly in the
+    #    descriptor string, e.g. '0.5*WKS + 0.3*MKS + 0.2*XYZ' (then 'extrinsic' is redundant).
+    'd': dict(
+        descriptor='WKS+HKS+MKS',
+        landmarks=None,
+        fm_params={**common_fm_params, 'symmetry_mode': 'orientation+extrinsic',
+                   'fit_params': {**common_fm_params['fit_params'], 'w_orient': 1.0}},
+    ),
+}
+fm_settings = FM_EXAMPLES[EXAMPLE]
+
+run_pipeline(
+    path_str=base_mesh_path,
+    compute_basicGeo=compute_BasicGeo,
+    metrics=metrics,
+    plot_basicGeo=plot_basicGeo,
+    matrix_tranformation=compute_FM,
+    diagonal_analysis=compute_FMdiagonal_analysis,
+    isometric_analysis=compute_isometric_analysis,
+    k_eigenfunctions=FM_k_eigenfunctions,
+    k_eigenvalues=FM_k_eigenvalues,
+    descriptor=fm_settings['descriptor'],
+    landmarks=fm_settings['landmarks'],
+    fm_params=fm_settings['fm_params'],
+    compute_physic_fields=compute_physic_fields
+)
+
+##################################################################################################################################################################################################################################################################################

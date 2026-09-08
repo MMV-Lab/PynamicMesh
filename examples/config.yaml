@@ -11,19 +11,51 @@ Functional_Map:
   matrix_tranformation: True
   diagonal_analysis: True
   isometric_analysis: True
-  k_eigenfunctions: (10,10)
+  k_eigenfunctions: [10, 10]          # size of the map (k1, k2); a single int k means (k, k)
   k_eigenvalues: 100
-  descriptor: 'WKS+HKS'
-  landmarks: 'precomputed'
+  # Descriptor families and energy shares: WKS, HKS, MKS (Matérn), XYZ (aligned coordinates), NRM (normals).
+  # 'WKS+HKS' -> equal shares; weights are renormalized to sum to one.
+  descriptor: '0.6*WKS + 0.4*MKS'
+  # null (no landmarks) | 'precomputed' (landmark.npy from precompute_landmarks) | 'auto' (automatic selection)
+  landmarks: 'auto'
   compute_physic_fields: True
+  fm_params:
+    # 'none' | 'landmarks' | 'orientation' | 'extrinsic', combinable with '+'
+    symmetry_mode: 'landmarks+orientation+extrinsic'
+    n_descr: 100                      # spectral filters per descriptor family
+    subsample_step: 4                 # keep 1 column out of 4 (recommended with landmarks)
+    landmark_params:                  # automatic landmark selection ('auto') and landmark block
+      n_landmarks: 12
+      match: 'hybrid'                 # 'hybrid' | 'extrinsic' | 'identity'
+      max_rel_dist: 0.15
+      max_distortion: 0.25
+      min_landmarks: 4
+      search_rel_radius: 0.10
+      weight: 1.0
+    descr_params:
+      nu: 1.5                         # Matérn smoothness (MKS)
+      # min_l: 0.01                   # Matérn lengthscale range; default mesh-adaptive
+      # max_l: 10.0
+      k_smooth: 30                    # LB low-pass for XYZ / NRM
+      xyz_weight: 0.25                # energy share of the XYZ block added by 'extrinsic'
+    fit_params:
+      w_descr: 0.1
+      w_lap: 0.001
+      w_dcomm: 1.0
+      w_orient: 1.0                   # only used when symmetry_mode includes 'orientation'
+    refine: 'auto'                    # 'auto' (ZoomOut) | 'icp' | [nit, step]
+    dt: 1.0                           # time step for velocity / acceleration fields
+    verbose: False
 
 Reeb_Graph:
   compute_reeb: True
   time_graph_analysis: True
   reeb_scalar: 'geodesic'
   bins: 30
-  scalar_args: 
-    vertex_ref_index: [4896]
+  scalar_args:
+    vertex_ref_index: [4896]          # index, list of indices, 'mass_center' or 'precomputed'
+    geodesic_solver: 'heat'           # 'heat' | 'dijkstra'
+    equalize_histogram: False         # True -> rank-normalized field (equally populated bins)
 
 Graph_similarity:
     graph_sim: True
