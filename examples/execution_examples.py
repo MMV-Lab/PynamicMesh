@@ -7,7 +7,8 @@ from PynamicMesh.utils.visualizers import (
     edit_graph,
     visualize_physics,
     visual_selection_edition, 
-    precompute_landmarks
+    precompute_landmarks,
+    visualize_obj_sequence
 )
 
 ####################################################################################################### Paths reference list ##########################################################################################################################################
@@ -18,13 +19,15 @@ mesh_path = '/PynamicMesh/Mesh_models/scene1'
 matrix_path = '/PynamicMesh/Results/scene1/Transform_Matrices'
 reeb_path = '/PynamicMesh/Results/scene1/Reeb_Graphs'
 csv_file_path = '/PynamicMesh/Results/scene1/Graph_analysis/time_analysis.csv'
+mesh_objs_folder = '/Results/scene1/active_surface_lab/01_Passive_Relaxation'
 
-###################################################################################################### Windos #########################################################################################################################################################
+###################################################################################################### Windows #########################################################################################################################################################
 base_mesh_path = r'\PynamicMesh\Mesh_models'
 mesh_path = r'\PynamicMesh\Mesh_models\scene1'
 matrix_path = r'\PynamicMesh\Results\scene1\Transform_Matrices'
 reeb_path = r'\PynamicMesh\Results\scene1\Reeb_Graphs'
 csv_file_path = r'\Results\scene1\Graph_analysis\time_analysis.csv'
+mesh_objs_folder = r'\Results\scene1\active_surface_lab\01_Passive_Relaxation'
 
 ###########################################################################################################################################################################################################################################################################
 
@@ -141,6 +144,11 @@ visualize_reeb_graphs(mesh_path, reeb_path)
 ####################################################################################################### Functional Map Visualizer Launcher  #################################################################################################################################
 print('Multi-Physics Mapping visualizations...') 
 visualize_physics(mesh_path, matrix_path, on_time=False)
+
+
+####################################################################################################### Mesh sequence Visualizer Launcher  #################################################################################################################################
+print('Mesh sequence Visualization...') 
+visualize_obj_sequence(mesh_objs_folder)
 
 ###################################################################################################### Similarity Metrics Among Graphs and ploting  ##########################################################################################################################
 csv_sim_path = graph_similarity(reeb_folder_path=reeb_path,metrics_list=graph_metrics)

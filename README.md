@@ -55,6 +55,45 @@ PynamicMesh offers a full general range of pipelines based on Topology, Differen
 
 For a detailed and applied understanding of meshes as Manifolds and triangulations, the following [Jupyter Notebook](https://github.com/JairMathAI/Understanding_Persistent_Homology/blob/main/Persistent_Homology.ipynb) might interest you.
 
+
+<details>
+<summary><strong><span style="font-size:25px;">Mesh visualization</span></strong></summary>
+
+The project run with meshes in .obj or .mat format
+
+In order to visualize a sequence of .obj meshes run:
+
+```python
+from PynamicMesh.utils.visualizers import  visualize_obj_sequence
+
+print('Mesh sequence Visualization...') 
+visualize_obj_sequence('mesh/obj/folder')
+```
+In order to visualize a sequence of .mat meshes/images run:
+
+```python
+from PynamicMesh.utils.mat_files import MatViewer 
+from pathlib import Path
+
+folder_path = Path('path/to/image_or_mesh/.mat/folder')
+viewer = MatViewer(folder_path)
+viewer.show()
+```
+
+In order to convert .mat meshes/images to .obj/.tiff respectively run:
+
+```python
+from PynamicMesh.utils.mat_files import mat_file_converter 
+from pathlib import Path
+
+folder_path = Path('path/to/image_or_mesh/.mat/folder')
+mat_file_converter(folder_path)
+```
+
+<img src="./assets/mesh_view.gif" style="max-width: 100%; height: auto; display: block; margin: 10px auto;"/>
+
+</details>
+
 <details>
 <summary><strong><span style="font-size:25px;">Global Geometry</span></strong></summary>
 
@@ -556,6 +595,8 @@ The keys `weight` and `descriptor` also apply to explicit and `'precomputed'` la
 <summary><span style="font-size:21px;">Symmetry-Aware Mapping</span></summary>
 
 Intrinsic descriptors (WKS, HKS, MKS) are invariant under the intrinsic symmetries of a shape: if a body has a left/right isometry, the two front legs have identical signatures, and the map is determined only up to that symmetry. No purely intrinsic point descriptor can break such a symmetry, so three complementary mechanisms are provided and selected with `fm_params['symmetry_mode']` (combinable with `+`):
+
+You can take a look for the usage example code [here](./examples/landmarks_descriptors_usage.py)
 
 <b>Landmarks</b> ```'landmarks'``` : landmark-localized descriptors anchored at known or automatically selected correspondences (see <b>Landmark Options</b>).
 
@@ -1491,6 +1532,739 @@ path_str = data_cfg.get("path_str")
 run_batch(config,path_str)
 ```
 
+
+</details>
+
+
+<details>
+<summary><strong><span style="font-size:25px;">Virtual Lab (Active Surfaces Simulations)</span></strong></summary>
+
+The Virtual Lab turns a real cell mesh into a **mechano-chemical simulation**: the surface is treated as an *active surface* (the actomyosin cortex) whose tension, bending moments and cortical flows are set by a regulator field (active myosin) that lives on the surface, is transported by the flow it creates and reacts to the mechanics it produces. On top of the physics, the module provides the infrastructure of a laboratory: experiments defined as reusable protocols, perturbation assays (optogenetics, laser ablation, drug wash-in), parameter sweeps, metrics, animations.
+
+<center>
+<b>GIF Simulations examples</b>
+</center>
+
+<table>
+  <!-- ROW 1 -->
+  <tr>
+    <td align="center">
+      <img src="./assets/01_Cell_Passive_Control.gif" width="50%" height="50%" /><br />
+      <sub>Passive Control</sub>
+    </td>
+    <td align="center">
+      <img src="./assets/01b_Fluid_Rounding.gif" width="50%" height="50%" /><br />
+      <sub>Fluid Rounding</sub>
+    </td>
+    <td align="center">
+      <img src="./assets/02_Cell_Polar_Contraction.gif" width="50%" height="50%" /><br />
+      <sub>Polar Contraction</sub>
+    </td>
+  </tr>
+  
+  <!-- ROW 2 -->
+  <tr>
+    <td align="center">
+      <img src="./assets/03_Cell_Cytokinesis_Ring.gif" width="50%" height="50%" /><br />
+      <sub>Cytokinesis Ring</sub>
+    </td>
+    <td align="center">
+      <img src="./assets/04_Cell_Torque_Folding.gif" width="50%" height="50%" /><br />
+      <sub>Torque Folding</sub>
+    </td>
+    <td align="center">
+      <img src="./assets/05_Cell_Protrusion_Anchored.gif" width="50%" height="50%" /><br />
+      <sub>Protrusion Anchored</sub>
+    </td>
+  </tr>
+
+  <!-- ROW 3 -->
+  <tr>
+    <td align="center">
+      <img src="./assets/06_Cell_Buckling.gif" width="50%" height="50%" /><br />
+      <sub>Buckling</sub>
+    </td>
+    <td align="center">
+      <img src="./assets/08_Cell_Pulsatile_Cortex.gif" width="50%" height="50%" /><br />
+      <sub>Pulsatile Cortex</sub>
+    </td>
+    <td align="center">
+      <img src="./assets/09_Cell_Optogenetic_Wave.gif" width="50%" height="50%" /><br />
+      <sub>Optogenetic Wave</sub>
+    </td>
+  </tr>
+
+  <!-- ROW 4 -->
+  <tr>
+    <td align="center">
+      <img src="./assets/10_Cell_Spontaneous_Polarity.gif" width="50%" height="50%" /><br />
+      <sub>Spontaneous Polarity</sub>
+    </td>
+    <td align="center">
+      <img src="./assets/11_Cell_Curvature_Feedback_Folding.gif" width="50%" height="50%" /><br />
+      <sub>Curvature Feedback Folding</sub>
+    </td>
+    <td align="center">
+      <img src="./assets/12_Cell_Strain_Feedback_Pulses.gif" width="50%" height="50%" /><br />
+      <sub>Strain Feedback Pulses</sub>
+    </td>
+  </tr>
+
+  <!-- ROW 5 -->
+  <tr>
+    <td align="center">
+      <img src="./assets/13_Cell_Laser_Ablation.gif" width="50%" height="50%" /><br />
+      <sub>Laser Ablation</sub>
+    </td>
+    <td align="center">
+      <img src="./assets/14_Cell_Ring_Blebbistatin.gif" width="50%" height="50%" /><br />
+      <sub>Ring Blebbistatin</sub>
+    </td>
+    <td align="center">
+      <img src="./assets/20_Compose_Protrusion+Buckling.gif" width="50%" height="50%" /><br />
+      <sub>Protrusion + Buckling</sub>
+    </td>
+  </tr>
+
+  <!-- ROW 6 -->
+  <tr>
+    <td align="center">
+      <img src="./assets/21_Compose_Protrusion+Pulsatile.gif" width="50%" height="50%" /><br />
+      <sub>Protrusion + Pulsatile</sub>
+    </td>
+    <td align="center">
+      <img src="./assets/22_Sequence_Protrude-Buckle-Ablate.gif" width="50%" height="50%" /><br />
+      <sub>Protrude -> Buckle -> Ablate</sub>
+    </td>
+    <td align="center">
+      <img src="./assets/23_Sequence_Polarise-then-Divide.gif" width="50%" height="50%" /><br />
+      <sub>Polarise -> Divide</sub>
+    </td>
+  </tr>
+</table>
+
+<center>
+<b>Mesh Simulation result visualizer</b>
+</center>
+
+<img src="./assets/sumulation_visualizer.gif" style="max-width: 100%; height: auto; display: block; margin: 10px auto;"/>
+<details>
+<summary><span style="font-size:23px;">General Overview</span></summary>
+
+The module is organised in layers, each one usable on its own:
+
+<b>Mesh preparation</b> (`prepare_mesh`, `to_physical_units`): repairs the input surface (degenerate, duplicate and non-manifold faces, holes), remeshes it to a target resolution with isotropic triangles, relaxes the triangle quality, orients the normals outward and rescales the cell so that its equivalent-sphere radius is $R_{eq}=(3V/4\pi)^{1/3}=1$. The scale factors are stored in the mesh and `to_physical_units` maps any simulated frame back to the original units.
+
+<b>Discrete geometry</b> (`DiscreteGeometryEngine`): the differential operators of the surface (cotangent Laplace–Beltrami, vertex areas, normals, mean and Gaussian curvature, tangential gradient, edge and quality statistics), rebuilt every time the surface moves.
+
+<b>Material model</b> (`ActiveSurfaceConstitutiveModel`): the passive (Helfrich) and active coefficients of the surface, its dissipation, the volume/area constraints, and the viscoelastic *shell* terms that let a real cell shape be remembered (in-plane elasticity, curvature memory, turnover time).
+
+<b>Time integrator</b> (`ActiveSurfaceSimulator`): solves the overdamped force balance every step as a sparse linear system, with the stiff bending operator treated semi-implicitly, an exact volume constraint, adaptive time stepping, tangential mesh regularisation (ALE) and on-the-fly refinement of over-stretched regions.
+
+<b>Regulator chemistry</b> (`ChemistryModel` and its implementations `LinearTurnover`, `MechanosensitiveTurnover`, `ExcitableRho`, `TuringPolarity`): pluggable reaction kinetics of one or several species living on the surface. Reactions may depend on the local mechanics (curvature, tension, strain rate) and on external lab-frame signals, which closes the loop mechanics → chemistry → mechanics.
+
+<b>Perturbations</b>: `Stimulus` objects (`GaussianPulse`, `UniformStimulus`, `PatternStimulus`) are time dependent signals in the laboratory frame (optogenetic illumination, drug wash-in); `Event` objects (`LaserAblation`, `ParameterStep`) are one-shot modifications of the state at a given time (cortex ablation, drug that switches a material parameter). External forces (`LocalNormalForce`, `AnchorSpring`, `UniformBodyForce`) represent polymerisation pressure, adhesion and body forces.
+
+<b>Protocols</b> (`Protocol`): an experiment definition (material, regulator field, forces, chemistry, stimuli, events, duration) that can be composed in parallel with other protocols (`A + B`: the ingredients are merged) or chained in time (`A >> B`: one continuous simulation whose stages switch mechanics and inputs without losing geometry, regulator or elastic memory).
+
+<b>Laboratory and run management</b> (`VirtualLaboratory`, `ExperimentRun`): every execution of a driver creates `Results/Virtual_lab/Experiment_<id>/` with one folder per laboratory and per experiment (frames, per-frame fields, `metrics.csv`, `params.json`, `log_output.txt`), a `simulation_gifs/` folder and a global `log_output.txt` that collects all the status output. The console only shows a transient progress bar of the running experiment; pressing <kbd>Enter</kbd> in the console stops the running experiment after the current step (everything computed so far is saved) and the driver continues with the next one.
+
+You can check the experiments examples executions [here](./examples/Virtual_Lab_execution.py) 
+
+</details>
+
+<details>
+<summary><span style="font-size:23px;">Theoretical Description</span></summary>
+
+The physics follows the covariant theory of active surfaces of Salbreux & Jülicher (*Mechanics of active surfaces*, Phys. Rev. E 96, 032404, 2017), restricted to an **isotropic, non-chiral fluid surface with broken up–down symmetry** embedded in a viscous medium at low Reynolds number, extended with the elastic thin-shell terms of their Sec. IV so that a given cell shape can be preserved. Throughout, lengths are measured in units of $R_{eq}$, tensions in units of a reference tension $\gamma$, and time in units of $\xi R_{eq}^2/\gamma$ (drag over tension). For real cells $\kappa/(\gamma R^2)\sim 10^{-5}\ldots10^{-2}$: bending is a small correction and the presets use $\kappa\sim 0.01$–$0.05$.
+
+<details>
+<summary><span style="font-size:21px;">Discrete geometry of the surface</span></summary>
+
+The surface is a closed triangle mesh with vertex positions $\mathbf{X}_i$, outward normals $\mathbf{n}_i$ and barycentric vertex areas $A_i=\tfrac13\sum_{f\ni i}A_f$. The convention is that a sphere of radius $R$ has mean curvature $H=1/R>0$ and Gaussian curvature $K=1/R^2$; the trace of the curvature tensor of the paper is $C_k{}^k=2H$.
+
+<b>Laplace–Beltrami operator.</b> With the cotangent weights $w_{ij}=\tfrac12(\cot\alpha_{ij}+\cot\beta_{ij})$ of the two angles opposite to the edge $ij$, the stiffness matrix $W$ and the mass matrix $M=\mathrm{diag}(A_i)$ give
+
+$$(\Delta f)_i=\frac{1}{A_i}\sum_{j\sim i} w_{ij}\,(f_j-f_i)\quad\Longleftrightarrow\quad \Delta f = M^{-1}W f ,$$
+
+a negative semi-definite operator that is exact for linear functions on the triangles. Cotangents of near-degenerate corners are clipped for robustness.
+
+<b>Curvatures.</b> The mean curvature comes from the Laplacian of the embedding, $\Delta\mathbf{X}=-2H\mathbf{n}$, i.e. $H_i=-\tfrac12\,(\Delta\mathbf{X})_i\cdot\mathbf{n}_i$; the Gaussian curvature from the angle defect (discrete Gauss–Bonnet), $K_i=(2\pi-\sum_{f\ni i}\theta_{f,i})/A_i$, so that $\sum_i K_iA_i=4\pi$ exactly on any closed genus-0 mesh.
+
+<b>Gradient.</b> The tangential gradient of a vertex field is the area-weighted average of the (constant) gradients on the incident triangles, $\nabla f|_f=\tfrac{1}{2A_f}\sum_k f_k\,\mathbf{n}_f\times\mathbf{e}_k$ with $\mathbf{e}_k$ the edge opposite to vertex $k$, projected onto the tangent plane at the vertex.
+
+<b>Quality.</b> The per-face quality $q_f=4\sqrt3\,A_f/\sum_k|\mathbf{e}_k|^2$ (1 for equilateral, 0 for degenerate) drives the mesh regularisation and the stability diagnostics; the enclosed volume is computed by the divergence theorem $V=\tfrac16\sum_f \mathbf{p}_0\cdot(\mathbf{p}_1\times\mathbf{p}_2)$.
+
+</details>
+
+<details>
+<summary><span style="font-size:21px;">Constitutive relations and force balance</span></summary>
+
+A regulator field $c(\mathbf{x},t)\ge 0$ (active myosin density) sets the local chemical drive $\Delta\mu\to\Delta\mu\,\phi(c)$ through the saturating function
+
+$$\phi(c)=\frac{c}{1+c/c_{sat}},$$
+
+so that a bounded density gives a bounded active stress ($c_{sat}=\infty$ recovers the linear drive). Every active coefficient multiplies $\phi(c)$; with $c=0$ the surface is a passive Helfrich membrane, with a uniform $c=1$ it is the homogeneous active surface of the paper (Sec. III F).
+
+<b>Tensions and moments.</b> The in-plane tension and bending moment tensors are (paper Eqs. 52–55)
+
+$$\bar t^{ij}=\big[\gamma_H+\zeta\phi+(-\kappa C_0+\zeta'\phi)\,C_k{}^k\big]g^{ij}+2\tilde\zeta\phi\,\tilde C^{ij},\qquad
+\bar m^{ij}=\big[(\kappa_{\rm eff}+\kappa_g)C_k{}^k-b\big]g^{ij}-\kappa_{g}C^{ij},$$
+
+with the active renormalisation of the bending rigidity and the active torque that acts as a spontaneous curvature
+
+$$\kappa_{\rm eff}=\kappa+(\tilde\zeta_c+\zeta'_c)\,\phi(c),\qquad b=\kappa C_0-\zeta_c\,\phi(c).$$
+
+Here $\gamma_H$ is the passive tension, $\zeta$ the active isotropic tension ($>0$ contractile), $\zeta'$ a tension–curvature coupling, $\tilde\zeta$ an anisotropic tension acting only where the principal curvatures differ (tubes, necks, saddles), $\zeta_c$ the active torque, and $\tilde\zeta_c,\zeta'_c$ the active corrections to $\kappa$ (negative values soften the surface).
+
+<b>Force densities.</b> Inserting the constitutive relations into the covariant force balance and taking the variational part from the effective energy $E=\int\big[\tfrac{\kappa_{\rm eff}}{2}(2H)^2-2bH+s\big]dA$ gives the normal force density
+
+$$f_n=\Delta\!\left(2\kappa_{\rm eff}H-b\right)+4\kappa_{\rm eff}H\left(H^2-K\right)+2bK-2sH-4\zeta'\phi H^2-4\tilde\zeta\phi\left(H^2-K\right)+p,$$
+
+and the tangential force density that drives cortical flows toward regions of high tension,
+
+$$\mathbf{f}_t=\nabla s+2H^2\nabla\kappa_{\rm eff}-2H\nabla b+\nabla\!\left(2\zeta'\phi H\right)+2\tilde\zeta\phi\,\nabla H,$$
+
+where the total isotropic tension collects the passive, active, spontaneous-curvature and area-penalty contributions
+
+$$s=\gamma_H+\zeta\phi(c)+\tfrac12\kappa C_0^2+k_A\frac{A-A_0}{A_0},$$
+
+and $p$ is the pressure of the enclosed fluid (see the volume constraint below). The bending operator $\Delta(2\kappa_{\rm eff}H)$ is fourth order in the positions and is the stiff part of the problem.
+
+<b>Dissipation.</b> The surface is overdamped: a local friction $\xi$ with the medium and a surface shear viscosity $\eta$ acting as a Laplacian on the velocity,
+
+$$\xi\,\mathbf{v}-\eta\,\Delta\mathbf{v}=\mathbf{f}_n\,\mathbf{n}+\mathbf{f}_t+\mathbf{f}_{\rm el}+\mathbf{f}_{\rm ext}+p\,\mathbf{n}.$$
+
+Approximations with respect to the full theory are documented in the module: no chiral couplings, no up–down asymmetric viscosity, the $2\tilde\zeta\tilde C^{ij}\partial_i c$ term is dropped (needs the full shape operator), gradients of $\kappa_g$ give no bulk force on closed surfaces (Gauss–Bonnet), and the medium is a local drag rather than a bulk Stokes flow.
+
+<b>Linear stability.</b> On a sphere of radius $R$ with uniform drive and a negative effective tension $\gamma_H+\zeta\phi<0$, the shape mode $l$ is unstable when $|\gamma_H+\zeta\phi|\,(l-1)(l+2)>\kappa\,l(l+1)(l-1)(l+2)/R^2$; the surface buckles when $\zeta\phi<-\gamma_H$ (paper Eq. 57) and softens into short-wavelength instabilities when $\kappa_{\rm eff}<0$ (Eq. 58, bounded in the code by $\kappa_{\rm eff}\ge10^{-3}\kappa$). These thresholds are the reference for the `active_buckling` and `curvature_tension_instability` presets.
+
+</details>
+
+<details>
+<summary><span style="font-size:21px;">Viscoelastic shell: remembering the cell shape</span></summary>
+
+A purely fluid active surface relaxes any initial shape to a sphere on the time scale $\xi/(\kappa q^4)$, which is instantaneous for the fine features of a real cell. To simulate deformations *of a given cell*, the surface is given a reference configuration (paper Sec. IV) built from the input mesh:
+
+<b>In-plane elasticity.</b> Every edge is a spring with rest length $\ell_0$ equal to its initial length and every triangle has a rest area $A^0_f$,
+
+$$\mathbf{F}_{\rm shear}=\sum_{\rm edges}E_{\rm shear}\,(\ell-\ell_0)\,\hat{\mathbf{d}},\qquad
+\mathbf{F}_{\rm area}=-\sum_f E_{\rm area}\,\frac{A_f-A_f^0}{A_f^0}\,\nabla_{\mathbf{p}}A_f ,$$
+
+converted to force densities by the vertex areas. $E_{\rm shear}$ and $E_{\rm area}$ are two-dimensional moduli in units of the tension scale.
+
+<b>Curvature memory.</b> The spontaneous curvature becomes a field equal to the initial curvature, $C_0(\mathbf{x})=2H_0(\mathbf{x})$, lightly smoothed by solving $(M-\ell_s^2W)\,C_0=M\,2H_0$ with $\ell_s$ a few edge lengths, so that bending forces vanish on the input shape and resist departures from it.
+
+<b>Turnover (Maxwell relaxation).</b> The cortex is continuously rebuilt: the reference configuration relaxes toward the current one with the remodelling time $\tau$,
+
+$$\dot\ell_0=\frac{\ell-\ell_0}{\tau},\qquad \dot A^0_f=\frac{A_f-A^0_f}{\tau},\qquad \dot C_0=\frac{2H-C_0}{\tau}.$$
+
+Deformations shorter than $\tau$ are elastic and reversible, longer ones become permanent; $\tau\to\infty$ is a permanently elastic shell, small $\tau$ a fluid. Cytokinesis-like furrowing needs $\tau$ shorter than the process (the ring preset uses $\tau=0.5$), while a control experiment uses $\tau=5$ to keep the morphology.
+
+</details>
+
+<details>
+<summary><span style="font-size:21px;">Time integration</span></summary>
+
+<b>Semi-implicit velocity solve.</b> Given the forces on the current geometry, the velocity is obtained from a sparse symmetric positive-definite system that contains the drag, the surface viscosity and linearised, implicit versions of the stiff operators (tension, bending, elasticity) weighted by the stabilisation $\theta$,
+
+$$\mathcal{A}\,\mathbf{V}=M\,\mathbf{F},\qquad
+\mathcal{A}=\xi M-\eta W-\theta\,\Delta t\,s_{\max}W+\theta\,\Delta t\,\kappa_{\max}\,WM^{-1}W-\theta\,\Delta t\,(E_{\rm shear}+E_{\rm area})\,h\,W ,$$
+
+with $s_{\max}$ and $\kappa_{\max}$ the largest tension and effective rigidity of the step and $h$ the mean edge. The fourth-order bending term $WM^{-1}W$ is what allows time steps orders of magnitude larger than an explicit scheme on fine meshes.
+
+<b>Volume constraint.</b> With `volume_constraint='lagrange'` the pressure is the multiplier that enforces the volume: the system is solved once for the forces and once for a unit pressure ($\mathcal{A}\mathbf{V}_p=M\mathbf{n}$), and $p$ is chosen so that the normal flux removes a fraction $\alpha$ of the volume error per step,
+
+$$\int v_n\,dA=-\alpha\,\frac{V-V_0}{\Delta t},\qquad \mathbf{V}\leftarrow\mathbf{V}+p\,\mathbf{V}_p .$$
+
+`'penalty'` uses $p=-k_V(V-V_0)/V_0$ and `'none'` leaves the volume free.
+
+<b>Adaptive time step.</b> The step is the requested $\Delta t_{\max}$ unless the CFL-like condition on the displacement, $v_{\max}\Delta t\le c_{\rm cfl}\,h_{5\%}$ ($h_{5\%}$ a robust short-edge length), requires a smaller one, in which case the system is re-solved because $\mathcal{A}$ depends on $\Delta t$. Non-finite velocities or $\Delta t$ hitting `min_dt` stop the experiment with a diagnostic (mesh quality, suggested remedies).
+
+<b>Material update and ALE regularisation.</b> Vertices are moved with the material, $\mathbf{X}\leftarrow\mathbf{X}+\Delta t\,\mathbf{V}$ (or only along the normal when `tangential_flow=False`). To keep the triangles well shaped under cortical flow, a tangential Laplacian smoothing $\mathbf{u}_i=\lambda\big(\bar{\mathbf{X}}_{N(i)}-\mathbf{X}_i\big)_{\parallel}$ is applied afterwards (extra passes when the minimum quality drops below the threshold). This mesh motion is *not* a material motion, so every field carried by the vertices is corrected semi-Lagrangian, $f\leftarrow f-\mathbf{u}\cdot\nabla f$, clipped to its local one-ring range, the total amount of every surface density is restored exactly, and the elastic rest state is carried along with the mesh move.
+
+<b>Adaptive refinement.</b> When a region swells (bleb, protrusion, buckle) its triangles stretch and the discretisation coarsens. With `refine_ratio` $r>0$, edges longer than $r\,h_0$ ($h_0$ the initial mean edge) are bisected at their midpoint; both adjacent faces are split (no T-junctions) and each face at most once per pass. Vertex fields are interpolated linearly at the midpoint, the halves of the split edge inherit $\ell_0/2$, the new edge to the opposite vertex gets its current length divided by the mean stretch of the parent face, the child faces get $A^0_f/2$, and events are notified so that their vertex masks stay consistent. The refinement changes only the resolution (macroscopic observables are unchanged) and is bounded by `max_vertex_factor`.
+
+</details>
+
+<details>
+<summary><span style="font-size:21px;">Regulator chemistry</span></summary>
+
+Each species $c_k$ is a surface density transported by the flow it helps create,
+
+$$\partial_t c_k+c_k\,\nabla\!\cdot\mathbf{v}=D_k\,\Delta c_k+R_k(c_1,\ldots;H,s,\nabla\!\cdot\mathbf{v},\sigma),$$
+
+integrated in three sub-steps: <b>advection–dilution</b> is exact in the Lagrangian frame, $c^{n+1}_i=c^n_i\,A^n_i/A^{n+1}_i$ (species declared as not *diluted*, e.g. buffered pools, keep their value); <b>diffusion</b> is implicit and mass conserving, $(M-\Delta t\,D_k W)\,\mathbf{c}^{n+1}=M\,\mathbf{c}$; <b>reactions</b> are integrated with Heun's method (second order) in `substeps` sub-steps with positivity enforced, followed by an optional multiplicative Langevin term $\sigma\sqrt{c\,\Delta t}\,\xi$ that models stochastic binding/unbinding and nucleates patterns. The first species is always `c`, the one that drives the mechanics through $\phi(c)$. The reaction terms receive a snapshot of the mechanics on the updated surface (`MechanicalState`): curvatures $H,K$, tension $s$, effective rigidity, area strain rate $\nabla\!\cdot\mathbf{v}=(1/A)\,dA/dt$, velocity, the material-attached target pattern $c_{eq}$ and the external lab-frame stimulus $\sigma(\mathbf{x},t)\ge0$ summed over all active stimuli.
+
+<b>LinearTurnover</b> (default; identical to the legacy `k_turn`): relaxation toward the pattern set by upstream signalling,
+
+$$R=k_{\rm turn}\,(c_{eq}+g\,\sigma-c).$$
+
+<b>MechanosensitiveTurnover</b>: the target level is modulated by the local mechanics (all couplings default to zero),
+
+$$R=k_{\rm turn}\Big[c_{eq}\big(1+\alpha_H(H-H_{\rm ref})\big)\big(1+\alpha_s(s/s_{\rm ref}-1)\big)+g\,\sigma-c\Big]+k_{\rm turn}\,\alpha_{\rm comp}\,c_{eq}\,\max(-\nabla\!\cdot\mathbf{v},0),$$
+
+with curvature sensing $\alpha_H$ (BAR-domain-like recruitment; combined with a negative $\zeta_c$ it closes a positive feedback that folds or tubulates the surface), tension-dependent binding $\alpha_s$ (catch-bond-like recruitment where the cortex is under tension) and recruitment by compressive strain rate $\alpha_{\rm comp}$ (compression → myosin → more compression, a purely mechanical positive feedback that drives a contractile clustering instability above a threshold). $H_{\rm ref}$ and $s_{\rm ref}$ default to the area-weighted means at $t=0$.
+
+<b>ExcitableRho</b>: a two-species activator–inhibitor model of the Rho–actomyosin cortex (Bement et al. 2015 type kinetics), with active RhoA $\rho$ as fast autocatalytic activator and actomyosin $c$ as slow inhibitor that is also the mechanical drive,
+
+$$\partial_t\rho=k_b(1+\sigma)+k_a\frac{\rho^n}{K^n+\rho^n}-k_d\,\rho-k_i\,c\,\rho+\alpha_{\rm comp}k_b\max(-\nabla\!\cdot\mathbf{v},0),\qquad
+\partial_t c=k_r\,\rho-k_c\,c .$$
+
+Two calibrated regimes are provided (time unit $\xi R^2/\gamma$): an **oscillatory** cortex ($k_b=2,\ k_a=80,\ K=1,\ k_d=4,\ k_i=40,\ k_r=10,\ k_c=8$; period $\approx0.53$, $c\in[0.4,1.2]$) and an **excitable** cortex (`ExcitableRho.excitable()`: $k_b=1,\ k_a=60,\ k_d=8$; rest $c\approx0.19$, a stimulus $\sigma\approx6$ lasting $0.1$ fires a single wave to $c\approx0.8$ and returns). With $D_\rho>D_c$ the oscillations become travelling waves and target patterns; noise nucleates them at random sites and the stimulus tests refractoriness.
+
+<b>TuringPolarity</b>: a mass-conserved wave-pinning polarity module (Mori, Jilkine & Edelstein-Keshet 2008; Cdc42/PAR type) with an active, slowly diffusing form $c$ and an inactive, fast-diffusing form $u$,
+
+$$\partial_t c=\Big(k_0+k_a\frac{c^2}{K^2+c^2}\Big)u-k_d\,c,\qquad \partial_t u=-\partial_t c .$$
+
+Both are surface densities so $\int(c+u)\,dA$ is exactly conserved, also under cortical flow; a single cap emerges from noise, its size set by the mean total density `total`, and the contractile flow toward the cap reinforces the polarity (mechano-chemical polarisation).
+
+<b>Custom kinetics</b> are added by subclassing `ChemistryModel`: declare the species names and diffusion coefficients and implement `rates(fields, mech)` returning $\partial_t$ of each species; transport, diffusion, integration and output are handled by the simulator.
+
+</details>
+
+<details>
+<summary><span style="font-size:21px;">Stimuli, events and external forces</span></summary>
+
+<b>Stimuli</b> are lab-frame signals $\sigma(\mathbf{x},t)\ge0$ evaluated on the current vertex positions and summed: `GaussianPulse` $\sigma=a\exp\!\big(-|\mathbf{x}-\mathbf{x}_0(t)|^2/2r^2\big)$ for $t_{\rm on}\le t\le t_{\rm off}$, optionally moving with a velocity and repeating with a period and duty cycle (pulsed optogenetic illumination); `UniformStimulus` a global step (drug wash-in or temperature); `PatternStimulus` any user function of positions and time. How $\sigma$ enters is decided by the chemistry model (added to the target level in the turnover models, to the Rho activation rate in `ExcitableRho`).
+
+<b>Events</b> are one-shot modifications applied when the simulation time passes $t_{\rm event}$, with an optional per-step update afterwards. `LaserAblation` sets all regulator species and the target pattern to zero within a spot (the active tension vanishes and the surrounding cortex recoils — the standard cortical tension assay); the target pattern recovers as $1-e^{-(t-t_{\rm cut})/\tau_{\rm rec}}$ and `recoil_speed` returns the mean outward speed of the wound margin. Since the model is a single surface, the ablation removes the *active* tension while the passive tension and the elastic shell remain, so recoil speeds are lower bounds. `ParameterStep` changes constitutive parameters at a given time (blebbistatin: $\zeta\to0$; cytochalasin: $E_{\rm shear}\to0$).
+
+<b>External forces</b> are force densities added to the balance: `LocalNormalForce` a Gaussian patch of normal force (polymerisation pressure, $>0$ outward, $<0$ indenting) with an on/off window; `AnchorSpring` a harmonic tether of the vertices within a radius toward a point (focal-adhesion-like anchoring, with an optional ramp); `UniformBodyForce` a constant force density (gravity, flow shear).
+
+</details>
+
+<details>
+<summary><span style="font-size:21px;">Protocols: composing experiments</span></summary>
+
+A `Protocol` bundles everything that defines an experiment: constitutive parameters, the regulator field (preferably as a callable *mesh → field*, so it can be evaluated on a deformed or refined mesh), the target pattern, duration, forces, chemistry, stimuli, events and initial extra species.
+
+<b>Parallel composition</b> `A + B` (or `Protocol.compose(A, B, …)`) builds a new protocol whose parameters are merged left to right (the later block wins on conflicts; every override is recorded and written to the log; explicit parameters win over everything), whose regulator fields are combined by sum or maximum, whose forces, stimuli and events are concatenated, and that carries at most one chemistry model (a conflict must be resolved explicitly).
+
+<b>Sequential composition</b> `A >> B >> C` builds a list of *stages* for one continuous simulation: stage $k+1$ starts from the final geometry, regulator fields and elastic reference of stage $k$; the material parameters, forces, stimuli, events and chemistry are switched, the internal clocks of the new stage (on/off times, event times) are shifted to the stage start, and the regulator is applied according to the stage's `c_mode` (`'set'` replaces $c$ and $c_{eq}$ by the block's field, `'add'` adds it, `'keep'` leaves the regulator untouched). A single trajectory and metrics file is produced; the stage boundaries are stored with the results. Any experiment already run is available as a building block through `lab.protocols[name]`.
+
+</details>
+
+<details>
+<summary><span style="font-size:21px;">Observables and outputs</span></summary>
+
+Every saved frame carries the point fields `concentration` ($c$), every extra species, `mean_curvature`, `gaussian_curvature`, `velocity`, `speed`, `normal_velocity`, `active_tension` ($\zeta\phi$), `active_torque` ($\zeta_c\phi$), `tension` ($s$), `normal_force`, `strain_rate` ($\nabla\!\cdot\mathbf{v}$), `stimulus` and, for shells, `reference_curvature`. With OBJ/PLY/STL output (geometry only) the fields are stored in a companion `frame_XXXX_fields.npz`; VTP keeps them inside the file. `load_trajectory` reloads both.
+
+The metrics recorded at every saved frame (`metrics.csv`) are: `Area`, `Volume`, `Area_ratio`, `Volume_ratio`, `Pressure`, `Max_Velocity`, `Mean_Speed`, `Retrograde_Flow` (area-weighted tangential speed, the cortical flow), `Sphericity` $\Psi=\pi^{1/3}(6V)^{2/3}/A$, `Aspect_Ratio` (ratio of the extreme principal axes of the area-weighted inertia tensor), `Centroid_Displacement` (migration), `H_mean`, `H_std`, `c_mean`, `c_max`, `c_std` (patterning / pulsatility read-out), `<species>_mean` and `<species>_max`, `Stimulus_max`, `N_vertices`, `Max_Edge_Ratio` (stretching relative to the initial resolution), `Min_Triangle_Quality`, and the energies `Bending_Energy` $\tfrac\kappa2\int(2H-C_0)^2dA$, `Gaussian_Energy`, `Tension_Energy` $\gamma_H A$, `Helfrich_Energy` and `Active_Tension_Integral` $\int\zeta\phi\,dA$. The furrow radius of a cytokinesis experiment is available through `furrow_radius(axis, width)` (mean distance to the axis of the vertices in the equatorial band), typically recorded through the experiment callback.
+
+</details>
+
+<details>
+<summary><span style="font-size:21px;">Compute backend and interruption</span></summary>
+
+Each step requires the solution of a few sparse SPD systems (the velocity operator for three velocity components and the pressure column, and one diffusion system per species). On the CPU they are solved by a SuperLU factorisation (one factorisation, several right-hand sides). When CuPy and a CUDA device are detected, `ComputeBackend` moves the operator and all right-hand sides to the device and solves them together with a Jacobi-preconditioned **block conjugate gradient**; a solve that does not reach the tolerance falls back to the CPU factorisation for that step (the number of fallbacks is logged). Because these systems are small and very sparse, the GPU only pays off for large meshes: in `gpu='auto'` mode it is engaged above `gpu_min_vertices` (default 8000), `gpu='on'` forces it and `gpu='off'` disables it. The detected backend is reported at the beginning of the run log. The edge list of an unchanged topology is cached between geometry rebuilds, which also speeds up the CPU path.
+
+Long experiments can be stopped without killing the driver: a daemon thread watches the console and pressing <kbd>Enter</kbd> during an experiment stops the time loop after the current step; the last computed state is saved as a frame, the metrics and parameters are written (`params.json` records `interrupted_by_user` and the reached time), the log marks the experiment as stopped by the user and the driver continues with the next experiment (within a sequence, with the next stage). Key presses between experiments are discarded. The watcher is active only when the standard input is an interactive console; in IDE consoles or notebooks it is inert (and says so in the log) unless forced with the environment variable `ACTIVE_SURFACE_FORCE_INTERRUPT=1`; `ACTIVE_SURFACE_NO_INTERRUPT=1` disables it (e.g. when the driver itself reads from the console).
+
+</details>
+</details>
+
+<details>
+<summary><span style="font-size:23px;">Virtual Lab Parameters</span></summary>
+
+All quantities are in simulation units: lengths in $R_{eq}$, tensions and moduli in the reference tension scale, time in $\xi R_{eq}^2/\gamma$. Meshes should be prepared with `prepare_mesh` so that $R_{eq}=1$; presets and default time steps assume it.
+
+<details>
+<summary><span style="font-size:21px;">Mesh preparation (prepare_mesh)</span></summary>
+
+Number of vertices of the remeshed surface (`None` keeps the input connectivity, only repair and relaxation are applied):
+```python
+target_vertices (int|None)
+```
+
+Rescale so that $R_{eq}=1$ and centre the cell; the factors are stored in the mesh `field_data` and used by `to_physical_units`:
+```python
+normalize_size (bool) : True
+```
+
+Remeshing method: `pyacvd` if installed with fallback to the built-in implicit (signed-distance / marching-cubes) remesher, force one of them, or keep the connectivity:
+```python
+remesh (str) : 'auto' | 'acvd' | 'implicit' | 'none'
+```
+
+Tangential relaxation iterations of the triangle quality and the minimum per-face quality $q_f$ targeted:
+```python
+relax_iterations (int) : 60
+min_quality (float) : 0.3
+```
+
+</details>
+
+<details>
+<summary><span style="font-size:21px;">Constitutive model (ActiveSurfaceConstitutiveModel)</span></summary>
+
+Passed to the experiments as a dictionary (a preset, a preset with overrides, or your own) or as an instance. Unknown keys are ignored with a warning.
+
+<b>Passive (Helfrich) parameters.</b> Bending rigidity $\kappa$, Gaussian modulus $\kappa_g$ (energy bookkeeping only on closed surfaces), passive tension $\gamma_H>0$ and spontaneous curvature of the trace $2H$ (a sphere of radius $R$ has $2H=2/R$):
+```python
+kappa_b (float) : 1.0
+kappa_g (float) : 0.0
+gamma_0 (float) : 0.5
+C0 (float) : 0.0
+```
+
+<b>Active couplings</b> (all multiply $\phi(c)$). Active isotropic tension $\zeta$ ($>0$ contractile like myosin; buckling when $\zeta\phi<-\gamma_H$); active torque $\zeta_c$ shifting the spontaneous curvature ($b=\kappa C_0-\zeta_c\phi$; $>0$ bends inward where $c$ is high, gradients fold the surface); tension–curvature coupling $\zeta'$ (non-variational); anisotropic tension $\tilde\zeta$ (acts only on tubes, necks and saddles); active renormalisation of the rigidity $\kappa_{\rm eff}=\kappa+(\tilde\zeta_c+\zeta'_c)\phi$ (negative values soften the surface):
+```python
+zeta (float) : 0.0
+zeta_c (float) : 0.0
+zeta_prime (float) : 0.0
+zeta_tilde (float) : 0.0
+zeta_c_tilde (float) : 0.0
+zeta_c_prime (float) : 0.0
+```
+
+<b>Dissipation.</b> Friction $\xi$ with the medium (per unit area, sets the time scale; must be $>0$) and surface shear viscosity $\eta$ (implicit Laplacian damping of the velocity, stabilising for strong flows):
+```python
+eta_drag (float) : 1.0
+eta_s (float) : 0.0
+```
+
+<b>Constraints.</b> Volume constraint mode, penalty stiffness of the volume (`'penalty'` mode) and area penalty $k_A$ acting as an extra isotropic tension ($0$ for a cortex whose area is not conserved, $>0$ for lipid-membrane-like surfaces):
+```python
+volume_constraint (str) : 'lagrange' | 'penalty' | 'none'
+kV (float) : 10.0
+kA (float) : 0.0
+```
+
+<b>Regulator chemistry (legacy scalar kinetics).</b> Surface diffusion of $c$ (used as the diffusion of `c` when the chemistry model does not specify it), turnover rate toward $c_{eq}$ (only used by the default `LinearTurnover`; ignored, with a warning, when another chemistry model is given) and the saturation density of the mechanical drive $\phi(c)=c/(1+c/c_{sat})$ ($\infty$ = linear; a finite value bounds the contractile instability at a physical density):
+```python
+D_chem (float) : 0.0
+k_turn (float) : 0.0
+c_saturation (float) : inf
+```
+
+<b>Viscoelastic shell (reference shape).</b> Two-dimensional shear/stretch modulus (edge springs with rest lengths of the input mesh), local area modulus (per-triangle rest areas), use of the input curvature as spontaneous curvature field, and the remodelling time $\tau$ of the reference configuration ($\infty$ permanently elastic, small = fluid; deformations longer than $\tau$ become permanent):
+```python
+E_shear (float) : 0.0
+E_area (float) : 0.0
+curvature_memory (bool) : False
+tau_remodel (float) : inf
+```
+
+<b>Presets.</b> Fluid active surfaces (`PRESETS`): `'passive_relaxation'`, `'cortical_contraction'`, `'active_buckling'`, `'polar_protrusion'`, `'cytokinesis_ring'`, `'active_torque_folding'`, `'curvature_tension_instability'`. Viscoelastic cells that keep their input shape (`CELL_PRESETS` = the fluid presets combined with `CELL_SHELL` $=\{E_{\rm shear}=3,\ E_{\rm area}=3,$ curvature memory, $\tau=5\}$): `'cell_passive'`, `'cell_contraction'`, `'cell_ring'`, `'cell_protrusion'`, `'cell_torque_folding'`, `'cell_buckling'` (softer shell, $E=0.5$). Any preset can be modified by dictionary merging.
+
+</details>
+
+<details>
+<summary><span style="font-size:21px;">Numerical settings (SimulationConfig)</span></summary>
+
+Maximum vertex displacement per step in units of the (robust) short edge length; the step is reduced when exceeded:
+```python
+cfl (float) : 0.2
+```
+
+Weight $\theta$ of the semi-implicit tension/bending/elastic operators ($\ge1$ recommended; $0$ = explicit):
+```python
+stabilization (float) : 1.0
+```
+
+Tangential Laplacian mesh relaxation per step ($0$ disables the ALE regularisation), minimum triangle quality below which extra relaxation passes are applied, and the maximum number of passes:
+```python
+regularize_mesh (float) : 0.1
+quality_threshold (float) : 0.3
+max_regularize_passes (int) : 10
+```
+
+Allow cortical (tangential) flow of the vertices; `False` moves vertices only along the normal:
+```python
+tangential_flow (bool) : True
+```
+
+Optional clipping of the force density magnitude, fraction of the volume error removed per step in `'lagrange'` mode, and minimum admissible time step (reaching it stops the experiment):
+```python
+max_force (float|None) : None
+volume_relaxation (float) : 1.0
+min_dt (float) : 1e-8
+```
+
+Store the point fields in every frame, and smoothing length (in mean edges) of the reference curvature field for `curvature_memory`:
+```python
+store_fields (bool) : True
+curvature_memory_smoothing (float) : 1.0
+```
+
+Compute backend of the sparse solves: use the GPU when CuPy and a CUDA device are found and the mesh is large enough, always, or never; and the mesh size above which `'auto'` engages the GPU:
+```python
+gpu (str) : 'auto' | 'on' | 'off'
+gpu_min_vertices (int) : 8000
+```
+
+Adaptive refinement of over-stretched regions: edges longer than `refine_ratio` times the initial mean edge are bisected ($0$ disables; $1.6$ typical), checked every `refine_every` steps with at most `max_refine_passes` bisection passes per check, never exceeding `max_vertex_factor` times the initial vertex count:
+```python
+refine_ratio (float) : 0.0
+refine_every (int) : 1
+max_refine_passes (int) : 3
+max_vertex_factor (float) : 3.0
+```
+
+</details>
+
+<details>
+<summary><span style="font-size:21px;">Running experiments (VirtualLaboratory.run_experiment)</span></summary>
+
+Prepared mesh ($R_{eq}=1$) and constitutive parameters (dictionary or model instance):
+```python
+mesh (pyvista.PolyData)
+params (dict|ActiveSurfaceConstitutiveModel)
+```
+
+Initial regulator field $c(\mathbf{x},0)$ per vertex (`None` = zero, i.e. passive surface) and the target pattern $c_{eq}$ of the turnover (defaults to the initial field). Helper generators: `uniform_field(mesh, value)`, `gaussian_cap(mesh, center, width, amplitude, background)`, `equatorial_ring(mesh, axis, width, amplitude, background, offset)`, `noisy_field(mesh, mean, std, seed)`, `from_function(mesh, fn)`:
+```python
+c0 (ndarray|None)
+c_eq (ndarray|None)
+```
+
+Simulated duration, maximum time step (`None` = automatic explicit estimate, at least $0.01$ with stabilisation) and number of steps between saved frames:
+```python
+total_time (float) : 1.0
+dt_max (float|None)
+save_every (int) : 1
+```
+
+Name of the experiment (its folder), whether to write the frames to disk, and whether to run `prepare_mesh` on the input first:
+```python
+exp_name (str)
+save_frames (bool) : True
+prepare (bool) : False
+```
+
+Reaction kinetics of the regulator(s); `None` reproduces the legacy relaxation with `k_turn`:
+```python
+chemistry (ChemistryModel|None) : LinearTurnover(...) | MechanosensitiveTurnover(...) | ExcitableRho(...) | TuringPolarity(...) | custom
+```
+
+Lab-frame stimuli $\sigma(\mathbf{x},t)$, one-shot events, external force densities and initial values of the extra species of the chemistry model:
+```python
+stimuli (list[Stimulus]|None)
+events (list[Event]|None)
+external_forces (list[ExternalForce]|None)
+fields0 (dict[str, ndarray]|None)
+```
+
+Function `callback(sim, metrics)` called after every step with the live simulator (custom read-outs such as `sim.furrow_radius(axis, width)` or `ablation.recoil_speed(sim)`):
+```python
+callback (callable|None)
+```
+
+<b>Related methods.</b> `run_protocol(mesh, protocol, exp_name=None, **run_kwargs)` runs a `Protocol` and registers it as a building block; `run_sequence(mesh, stages, exp_name, dt_max, save_every, save_frames, callback)` chains protocols on one simulation; `sweep(mesh, base_params, param_name, values, c0, total_time, prefix, **kwargs)` runs a one-parameter sweep; `compare(results, keys, log, title)` tabulates final metrics; `export_animation(result, filename, scalars, fps, cmap, clim, show_edges)` renders a GIF; `load_trajectory(exp_dir, fmt)` reloads saved frames with their fields.
+
+</details>
+
+<details>
+<summary><span style="font-size:21px;">Chemistry models</span></summary>
+
+<b>Common to all models.</b> Diffusion coefficient per species (a missing `'c'` falls back to `D_chem`, other missing species do not diffuse); species treated as surface densities (diluted by area change; default all); amplitude $\sigma$ of the multiplicative Langevin noise; number of Heun sub-steps per time step; random seed:
+```python
+diffusion (dict[str, float])
+diluted (tuple[str]|None)
+noise (float) : 0.0
+substeps (int)
+seed (int|None) : 0
+```
+
+<b>LinearTurnover.</b> Turnover rate and gain of the stimulus added to the target level:
+```python
+k_turn (float) : 0.0
+stimulus_gain (float) : 1.0
+```
+
+<b>MechanosensitiveTurnover.</b> Turnover rate; curvature sensing $\alpha_H$ ($>0$ recruits to high mean curvature), tension sensing $\alpha_s$ ($>0$ recruits under tension), recruitment by compressive strain rate $\alpha_{\rm comp}$ (threshold of the clustering instability between $\sim5$ and $\sim10$ in the contraction preset); reference curvature and tension (`None` = area-weighted means at $t=0$); stimulus gain:
+```python
+k_turn (float) : 1.0
+alpha_curvature (float) : 0.0
+alpha_tension (float) : 0.0
+alpha_compression (float) : 0.0
+H_ref (float|None)
+s_ref (float|None)
+stimulus_gain (float) : 1.0
+```
+
+<b>ExcitableRho</b> (species `c`, `rho`). Basal Rho activation $k_b$ (multiplied by $1+\sigma$), autocatalysis amplitude $k_a$, half-saturation $K$ and Hill exponent $n$, Rho inactivation $k_d$, inhibition by actomyosin $k_i$, actomyosin recruitment $k_r$ and disassembly $k_c$, compression feedback on activation $\alpha_{\rm comp}$, initial Rho level; `ExcitableRho.excitable(**overrides)` returns the quiescent excitable regime:
+```python
+k_b (float) : 2.0
+k_a (float) : 80.0
+K (float) : 1.0
+hill_n (float) : 2.0
+k_d (float) : 4.0
+k_i (float) : 40.0
+k_r (float) : 10.0
+k_c (float) : 8.0
+alpha_compression (float) : 0.0
+rho0 (float) : 0.05
+diffusion (dict) : {'c': 0.002, 'rho': 0.01}
+substeps (int) : 4
+```
+
+<b>TuringPolarity</b> (species `c`, `u`). Basal activation $k_0$, autocatalytic activation $k_a$ with half-saturation $K$, inactivation $k_d$, and mean total density $c+u$ per unit area that sets the cap size:
+```python
+k_0 (float) : 0.5
+k_a (float) : 8.0
+K (float) : 1.0
+k_d (float) : 4.0
+total (float) : 1.5
+diffusion (dict) : {'c': 0.002, 'u': 1.0}
+substeps (int) : 2
+```
+
+</details>
+
+<details>
+<summary><span style="font-size:21px;">Stimuli, events and external forces</span></summary>
+
+<b>GaussianPulse.</b> Centre (lab frame), Gaussian width, amplitude, on/off window, drift velocity of the spot, and period/duty cycle of pulsed illumination ($\infty$ = continuous):
+```python
+center (sequence[float])
+radius (float) : 0.3
+amplitude (float) : 1.0
+t_on (float) : 0.0
+t_off (float) : inf
+velocity (sequence[float]) : (0, 0, 0)
+period (float) : inf
+duty (float) : 1.0
+```
+
+<b>UniformStimulus.</b> Global amplitude and time window:
+```python
+amplitude (float) : 1.0
+t_on (float) : 0.0
+t_off (float) : inf
+```
+
+<b>PatternStimulus.</b> User function $\sigma=f(\text{points},t)$ returning one value per vertex (clipped to $\ge0$):
+```python
+fn (callable)
+```
+
+<b>LaserAblation.</b> Centre and radius of the spot, cut time, and recovery time of the target pattern ($\le0$ = no recovery); `mask` holds the ablated vertices and `recoil_speed(sim)` the read-out:
+```python
+center (sequence[float])
+radius (float) : 0.2
+t_cut (float) : 0.5
+recovery_time (float) : 1.0
+```
+
+<b>ParameterStep.</b> Time of the change and the constitutive parameters to set as keyword arguments (e.g. `zeta=0.0`):
+```python
+t_event (float)
+**changes
+```
+
+<b>LocalNormalForce.</b> Centre, strength ($>0$ pushes outward, $<0$ indents), Gaussian radius and time window:
+```python
+point (sequence[float])
+strength (float) : 1.0
+radius (float) : 1.0
+t_on (float) : 0.0
+t_off (float) : inf
+```
+
+<b>AnchorSpring.</b> Anchor point, stiffness per unit area, capture radius and linear ramp time of the stiffness:
+```python
+point (sequence[float])
+stiffness (float) : 1.0
+radius (float) : 1.0
+ramp_time (float) : 0.0
+```
+
+<b>UniformBodyForce.</b> Constant force density vector:
+```python
+vector (sequence[float]) : (0, 0, 0)
+```
+
+</details>
+
+<details>
+<summary><span style="font-size:21px;">Protocols (Protocol)</span></summary>
+
+Name (used as experiment name by default) and constitutive parameters:
+```python
+name (str)
+params (dict)
+```
+
+Regulator field and target pattern, as arrays or as callables `mesh -> array` (recommended, so that the block can be evaluated on any mesh when composed or chained), and initial values of extra species (arrays or callables):
+```python
+c0 (ndarray|callable|None)
+c_eq (ndarray|callable|None)
+fields0 (dict|None)
+```
+
+Duration, forces, chemistry, stimuli and events of the block:
+```python
+total_time (float) : 1.0
+external_forces (list)
+chemistry (ChemistryModel|None)
+stimuli (list)
+events (list)
+```
+
+How the regulator is applied when the protocol starts as a stage of a sequence:
+```python
+c_mode (str) : 'set' | 'add' | 'keep'
+```
+
+Default running options merged into `run_protocol` (e.g. `dt_max`, `save_every`):
+```python
+run_kwargs (dict)
+```
+
+<b>Composition.</b> `Protocol.compose(*protocols, name=None, params=None, c0_mode='sum', total_time=None, chemistry=None, c_mode=None)` merges blocks in parallel (`A + B` is a shorthand); `params` are explicit overrides that win over the merged ones, `c0_mode` combines the regulator fields by `'sum'` or `'max'`, `total_time` defaults to the longest block, `chemistry` resolves a conflict between blocks. `A >> B >> C` builds the stage list of a sequence. `protocol.with_(**changes)` returns a modified copy (`params={...}` is merged). The attributes `parents` and `notes` document how a composed protocol was built and which parameters were overridden.
+
+</details>
+
+<details>
+<summary><span style="font-size:21px;">Run management (ExperimentRun, VirtualLaboratory)</span></summary>
+
+<b>ExperimentRun.</b> Root folder of the results and prefix of the run folder (`<root>/<prefix>_<NNN>_<timestamp>/`), mirror the log lines to the console (above the progress bar), and an explicit run identifier (`None` = automatic counter + timestamp):
+```python
+root (str|Path) : 'Results/Virtual_lab'
+prefix (str) : 'Experiment'
+echo (bool) : False
+run_id (str|None)
+```
+
+Methods: `lab(name, **kwargs)` creates a `VirtualLaboratory` writing into the run folder; `log(*parts, echo=None)` appends a timestamped line to `log_output.txt`; `path(*parts)` returns a path inside the run folder; `export_animations(results, names=None, **kwargs)` renders GIFs into `simulation_gifs/`; `finish()` writes the closing summary.
+
+<b>VirtualLaboratory.</b> Output folder (set automatically by `run.lab`), frame formats (`'obj'`, `'ply'`, `'stl'` geometry only with field side-cars; `'vtp'` keeps the fields), save the per-frame fields, status lines (to the logs when attached to a run, to the console otherwise), numerical settings shared by its experiments, attached run, transient progress bar, and <kbd>Enter</kbd>-to-skip interruption:
+```python
+output_dir (str|Path) : 'active_surface_lab'
+save_formats (tuple[str]) : ('obj',)
+save_fields (bool) : True
+verbose (bool) : True
+config (SimulationConfig|None)
+run (ExperimentRun|None)
+progress (bool) : True
+interruptible (bool) : True
+```
+
+Environment variables: `ACTIVE_SURFACE_NO_INTERRUPT=1` disables the keyboard watcher; `ACTIVE_SURFACE_FORCE_INTERRUPT=1` enables it when the standard input is not detected as an interactive console.
+
+</details>
+</details>
+</details>
+
+<details>
+<summary><strong><span style="font-size:25px;">Project Bibliography</span></strong></summary>
+
+Would you like to go deep on the bases and fundaments of the project?
+
+<b>Books</b>
+
+[An Introduction to Manifolds](https://link.springer.com/book/10.1007/978-1-4419-7400-6) by Loring W. Tu
+[Introduction to Differential Geometry](https://link.springer.com/book/10.1007/978-3-662-64340-2) by Joel W. Robbin , Dietmar A. Salamon
+[Theoretical and Computational Fluid Mechanics Existence, Blow-up, and Discrete Exterior Calculus Algorithms](https://www.routledge.com/Theoretical-and-Computational-Fluid-Mechanics-Existence-Blow-up-and-Discrete-Exterior-Calculus-Algorithms/Moschandreou-Afas-Nguyen/p/book/9781032589251) By Terry E. Moschandreou, Keith Afas, Khoa Nguyen
+[The Dynamics of Biological Systems](https://link.springer.com/book/10.1007/978-3-030-22583-4)  By Arianna Bianchi, Thomas Hillen, Mark A. Lewis, Yingfei Yi
+
+<b>Papers</b>
+
+[Mechanics of active surfaces](https://journals.aps.org/pre/abstract/10.1103/PhysRevE.96.032404) By Salbreux Guillaume, Jülicher  Frank
+[Functional maps: a flexible representation of maps between shapes](https://dl.acm.org/doi/10.1145/2185520.2185526) By Ovsjanikov, Maks and Ben-Chen, Mirela and Solomon, Justin and Butscher, Adrian and Guibas, Leonidas
+[Reeb graphs for shape analysis and applications](https://www.sciencedirect.com/science/article/pii/S0304397507007396) By S. Biasotti, D. Giorgi, M. Spagnuolo, B. Falcidieno
 
 </details>
 
