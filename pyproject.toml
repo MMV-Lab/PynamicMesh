@@ -30,7 +30,8 @@ dependencies = [
     "torch",
     "gpytorch",
     "tifffile",
-    "imageio"
+    "imageio",
+    "pyacvd"
 ]
 
 
