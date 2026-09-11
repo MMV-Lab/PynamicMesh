@@ -2256,14 +2256,19 @@ Would you like to go deep on the bases and fundaments of the project?
 <b>Books</b>
 
 [An Introduction to Manifolds](https://link.springer.com/book/10.1007/978-1-4419-7400-6) by Loring W. Tu
+
 [Introduction to Differential Geometry](https://link.springer.com/book/10.1007/978-3-662-64340-2) by Joel W. Robbin , Dietmar A. Salamon
+
 [Theoretical and Computational Fluid Mechanics Existence, Blow-up, and Discrete Exterior Calculus Algorithms](https://www.routledge.com/Theoretical-and-Computational-Fluid-Mechanics-Existence-Blow-up-and-Discrete-Exterior-Calculus-Algorithms/Moschandreou-Afas-Nguyen/p/book/9781032589251) By Terry E. Moschandreou, Keith Afas, Khoa Nguyen
+
 [The Dynamics of Biological Systems](https://link.springer.com/book/10.1007/978-3-030-22583-4)  By Arianna Bianchi, Thomas Hillen, Mark A. Lewis, Yingfei Yi
 
 <b>Papers</b>
 
 [Mechanics of active surfaces](https://journals.aps.org/pre/abstract/10.1103/PhysRevE.96.032404) By Salbreux Guillaume, Jülicher  Frank
+
 [Functional maps: a flexible representation of maps between shapes](https://dl.acm.org/doi/10.1145/2185520.2185526) By Ovsjanikov, Maks and Ben-Chen, Mirela and Solomon, Justin and Butscher, Adrian and Guibas, Leonidas
+
 [Reeb graphs for shape analysis and applications](https://www.sciencedirect.com/science/article/pii/S0304397507007396) By S. Biasotti, D. Giorgi, M. Spagnuolo, B. Falcidieno
 
 </details>
